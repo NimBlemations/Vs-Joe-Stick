@@ -52,6 +52,9 @@ class HealthIcon extends FlxSprite
 			}
 			animation.play(char);
 			this.char = char;
+			
+			if (pixels == null)
+				changeIcon('face');
 		}
 	}
 

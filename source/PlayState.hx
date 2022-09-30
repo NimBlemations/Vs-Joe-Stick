@@ -82,6 +82,7 @@ class PlayState extends MusicBeatState
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
 	private var playerStrums:FlxTypedGroup<FlxSprite>;
+	private var opponentStrums:FlxTypedGroup<FlxSprite>;
 	private var grpNoteSplashes:FlxTypedGroup<NoteSplash>;
 
 	private var camZooming:Bool = false;
@@ -837,6 +838,8 @@ class PlayState extends MusicBeatState
 		add(grpNoteSplashes);
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
+		
+		opponentStrums = new FlxTypedGroup<FlxSprite>();
 
 		// startCountdown();
 
@@ -1329,6 +1332,8 @@ class PlayState extends MusicBeatState
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 				swagNote.sustainLength = songNotes[2];
 				swagNote.altNote = songNotes[3];
+				if (songNotes[4] != null)
+					swagNote.poseVariation = songNotes[4];
 				swagNote.scrollFactor.set(0, 0);
 
 				var susLength:Float = swagNote.sustainLength;
@@ -1340,7 +1345,7 @@ class PlayState extends MusicBeatState
 				{
 					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
-					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true);
+					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true, swagNote.poseVariation);
 					sustainNote.scrollFactor.set();
 					unspawnNotes.push(sustainNote);
 
@@ -1479,6 +1484,8 @@ class PlayState extends MusicBeatState
 			{
 				playerStrums.add(babyArrow);
 			}
+			else
+				opponentStrums.add(babyArrow);
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 50;
@@ -1587,6 +1594,8 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var cameraRightSide:Bool = false;
+	
+	var opponentSusArray:Array<Bool> = [false, false, false, false]; // If opponent is holding down on something
 
 	override public function update(elapsed:Float)
 	{
@@ -1902,6 +1911,33 @@ class PlayState extends MusicBeatState
 					}
 					if (daNote.altNote)
 						altAnim = '-alt';
+					
+					if (daNote.poseVariation > 0)
+						altAnim += '-' + daNote.poseVariation;
+					
+					opponentStrums.forEachAlive(function(staticNote:FlxSprite) // doin cool shit
+					{
+						if (staticNote.ID == daNote.noteData)
+						{
+							staticNote.animation.play('confirm', true);
+							if (daNote.isSustainNote && !daNote.animation.curAnim.name.endsWith('end') || !daNote.isSustainNote && daNote.sustainLength > 0)
+							{
+								#if debug
+								if (opponentSusArray[daNote.noteData] != true)
+									trace(daNote.noteData + " gottem");
+								#end
+								opponentSusArray[daNote.noteData] = true;
+							}
+							else
+							{
+								#if debug
+								if (opponentSusArray[daNote.noteData] != false)
+									trace(daNote.noteData + " shottem");
+								#end
+								opponentSusArray[daNote.noteData] = false;
+							}
+						}
+					});
 
 					switch (Math.abs(daNote.noteData))
 					{
@@ -1924,6 +1960,24 @@ class PlayState extends MusicBeatState
 					notes.remove(daNote, true);
 					daNote.destroy();
 				}
+				
+				opponentStrums.forEachAlive(function(staticNote:FlxSprite) // doin cool shit
+				{
+					if (staticNote.animation.curAnim.finished && staticNote.animation.curAnim.name == 'confirm' && !opponentSusArray[staticNote.ID])
+					{
+						staticNote.animation.play('static');
+					}
+					
+					staticNote.centerOffsets();
+					if (staticNote.animation.curAnim.name != 'confirm' || curStage.startsWith('school'))
+						staticNote.centerOffsets();
+					else
+					{
+						staticNote.centerOffsets();
+						staticNote.offset.x -= 13;
+						staticNote.offset.y -= 13;
+					}
+				});
 
 				// WIP interpolation shit? Need to fix the pause issue
 				// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
@@ -2453,17 +2507,22 @@ class PlayState extends MusicBeatState
 				health += 0.023;
 			else
 				health += 0.004;
+			
+			var altAnim:String = '';
+			
+			if (note.poseVariation > 0)
+				altAnim += '-' + note.poseVariation;
 
 			switch (note.noteData)
 			{
 				case 0:
-					boyfriend.playAnim('singLEFT', true);
+					boyfriend.playAnim('singLEFT' + altAnim, true);
 				case 1:
-					boyfriend.playAnim('singDOWN', true);
+					boyfriend.playAnim('singDOWN' + altAnim, true);
 				case 2:
-					boyfriend.playAnim('singUP', true);
+					boyfriend.playAnim('singUP' + altAnim, true);
 				case 3:
-					boyfriend.playAnim('singRIGHT', true);
+					boyfriend.playAnim('singRIGHT' + altAnim, true);
 			}
 
 			playerStrums.forEach(function(spr:FlxSprite)

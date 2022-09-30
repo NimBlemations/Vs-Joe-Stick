@@ -326,6 +326,7 @@ class ChartingState extends MusicBeatState
 	}
 
 	var stepperSusLength:FlxUINumericStepper;
+	var stepperPoseVariation:FlxUINumericStepper;
 
 	function addNoteUI():Void
 	{
@@ -335,10 +336,15 @@ class ChartingState extends MusicBeatState
 		stepperSusLength = new FlxUINumericStepper(10, 10, Conductor.stepCrochet / 2, 0, 0, Conductor.stepCrochet * 16);
 		stepperSusLength.value = 0;
 		stepperSusLength.name = 'note_susLength';
+		
+		stepperPoseVariation = new FlxUINumericStepper(10, 30, 1, 0, 0, 4);
+		stepperPoseVariation.value = 0;
+		stepperPoseVariation.name = 'note_poseVariation';
 
 		var applyLength:FlxButton = new FlxButton(100, 10, 'Apply');
 
 		tab_group_note.add(stepperSusLength);
+		tab_group_note.add(stepperPoseVariation);
 		tab_group_note.add(applyLength);
 
 		UI_box.addGroup(tab_group_note);
@@ -434,6 +440,10 @@ class ChartingState extends MusicBeatState
 			{
 				curSelectedNote[2] = nums.value;
 				updateGrid();
+			}
+			else if (wname == 'note_poseVariation')
+			{
+				curSelectedNote[4] = nums.value;
 			}
 			else if (wname == 'section_bpm')
 			{
@@ -825,7 +835,11 @@ class ChartingState extends MusicBeatState
 	function updateNoteUI():Void
 	{
 		if (curSelectedNote != null)
+		{
 			stepperSusLength.value = curSelectedNote[2];
+			if (curSelectedNote[4] != null)
+				stepperPoseVariation.value = curSelectedNote[4];
+		}
 	}
 
 	function updateGrid():Void
@@ -876,8 +890,12 @@ class ChartingState extends MusicBeatState
 			var daNoteInfo = i[1];
 			var daStrumTime = i[0];
 			var daSus = i[2];
+			var daPoseVar = 0;
+			
+			if (i[4] != null)
+				daPoseVar = i[4];
 
-			var note:Note = new Note(daStrumTime, daNoteInfo % 4);
+			var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, false, daPoseVar);
 			note.sustainLength = daSus;
 			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
 			note.updateHitbox();
@@ -916,7 +934,7 @@ class ChartingState extends MusicBeatState
 
 		for (i in _song.notes[curSection].sectionNotes)
 		{
-			if (i.strumTime == note.strumTime && i.noteData % 4 == note.noteData)
+			if (i[0] == note.strumTime && i[1] % 4 == note.noteData)
 			{
 				curSelectedNote = _song.notes[curSection].sectionNotes[swagNum];
 			}
@@ -965,13 +983,13 @@ class ChartingState extends MusicBeatState
 		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
 		// var noteSus = 0;
 
-		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, 0, false]);
+		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, 0, false, 0]);
 
 		curSelectedNote = _song.notes[curSection].sectionNotes[_song.notes[curSection].sectionNotes.length - 1];
 
 		if (FlxG.keys.pressed.CONTROL)
 		{
-			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, 0, false]);
+			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, 0, false, 0]);
 		}
 
 		trace(noteStrum);

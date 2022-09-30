@@ -1,6 +1,7 @@
 idle -5 0
 singUP -29 27
 singRIGHT -38 -7
+singRIGHT-1 -38 2
 singLEFT 12 -6
 singDOWN -10 -50
 singUPmiss -29 27

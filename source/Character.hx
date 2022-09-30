@@ -240,6 +240,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singUP', 'BF NOTE UP0');
 				quickAnimAdd('singLEFT', 'BF NOTE LEFT0');
 				quickAnimAdd('singRIGHT', 'BF NOTE RIGHT0');
+				quickAnimAdd('singRIGHT-1', 'BF NOTE RIGHT 2nd0');
 				quickAnimAdd('singDOWN', 'BF NOTE DOWN0');
 				quickAnimAdd('singUPmiss', 'BF NOTE UP MISS');
 				quickAnimAdd('singLEFTmiss', 'BF NOTE LEFT MISS');
@@ -371,6 +372,20 @@ class Character extends FlxSprite
 				playAnim('firstDeath');
 
 				flipX = true;
+			case 'joestick':
+				frames = Paths.getSparrowAtlas('characters/JoeStick');
+				quickAnimAdd('idle', 'IdleDance0');
+				quickAnimAdd('singDOWN', 'DownStick0');
+				quickAnimAdd('singLEFT', 'LeftStick0');
+				quickAnimAdd('singRIGHT', 'RightStick0');
+				quickAnimAdd('singUP', 'StickDown0'); // BRUHHHHHH WTF
+				quickAnimAdd('singLEFT-1', 'StickLeft2nd0');
+				quickAnimAdd('singLEFT-2', 'StickLeft3rd0');
+				quickAnimAdd('singUP-1', 'StickUp2nd0');
+				
+				loadOffsetFile(curCharacter);
+				
+				playAnim('idle');
 
 			case 'senpai':
 				frames = Paths.getSparrowAtlas('characters/senpai');

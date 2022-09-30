@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="JoeStick.png">
+	<!-- Created with Adobe Flash CS6 version 12.0.0.481 -->
+	<!-- http://www.adobe.com/products/flash.html -->
+	<SubTexture name="DownStick0000" x="0" y="0" width="275" height="230" frameX="-10" frameY="-14" frameWidth="285" frameHeight="276"/>
+	<SubTexture name="DownStick0001" x="275" y="0" width="185" height="256" frameX="-36" frameY="-20" frameWidth="285" frameHeight="276"/>
+	<SubTexture name="DownStick0002" x="460" y="0" width="133" height="249" frameX="-35" frameY="0" frameWidth="285" frameHeight="276"/>
+	<SubTexture name="DownStick0003" x="593" y="0" width="174" height="213" frameX="0" frameY="-15" frameWidth="285" frameHeight="276"/>
+	<SubTexture name="IdleDance0000" x="767" y="0" width="201" height="318" frameX="0" frameY="-9" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="IdleDance0001" x="767" y="0" width="201" height="318" frameX="0" frameY="-9" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="IdleDance0002" x="0" y="318" width="194" height="320" frameX="0" frameY="-7" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="IdleDance0003" x="0" y="318" width="194" height="320" frameX="0" frameY="-7" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="IdleDance0004" x="194" y="318" width="181" height="327" frameX="0" frameY="0" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="IdleDance0005" x="194" y="318" width="181" height="327" frameX="0" frameY="0" frameWidth="201" frameHeight="327"/>
+	<SubTexture name="LeftStick0000" x="375" y="318" width="191" height="303" frameX="0" frameY="0" frameWidth="193" frameHeight="303"/>
+	<SubTexture name="LeftStick0001" x="375" y="318" width="191" height="303" frameX="0" frameY="0" frameWidth="193" frameHeight="303"/>
+	<SubTexture name="LeftStick0002" x="566" y="318" width="176" height="283" frameX="-17" frameY="-19" frameWidth="193" frameHeight="303"/>
+	<SubTexture name="LeftStick0003" x="566" y="318" width="176" height="283" frameX="-17" frameY="-19" frameWidth="193" frameHeight="303"/>
+	<SubTexture name="RightStick0000" x="742" y="318" width="251" height="405" frameX="0" frameY="0" frameWidth="276" frameHeight="414"/>
+	<SubTexture name="RightStick0001" x="742" y="318" width="251" height="405" frameX="0" frameY="0" frameWidth="276" frameHeight="414"/>
+	<SubTexture name="RightStick0002" x="0" y="723" width="268" height="406" frameX="-8" frameY="-8" frameWidth="276" frameHeight="414"/>
+	<SubTexture name="RightStick0003" x="0" y="723" width="268" height="406" frameX="-8" frameY="-8" frameWidth="276" frameHeight="414"/>
+	<SubTexture name="StickDown0000" x="268" y="723" width="180" height="336" frameX="-13" frameY="0" frameWidth="216" frameHeight="337"/>
+	<SubTexture name="StickDown0001" x="268" y="723" width="180" height="336" frameX="-13" frameY="0" frameWidth="216" frameHeight="337"/>
+	<SubTexture name="StickDown0002" x="448" y="723" width="216" height="321" frameX="0" frameY="-16" frameWidth="216" frameHeight="337"/>
+	<SubTexture name="StickDown0003" x="448" y="723" width="216" height="321" frameX="0" frameY="-16" frameWidth="216" frameHeight="337"/>
+	<SubTexture name="StickLeft2nd0000" x="664" y="723" width="286" height="203" frameX="-3" frameY="0" frameWidth="289" frameHeight="203"/>
+	<SubTexture name="StickLeft2nd0001" x="664" y="723" width="286" height="203" frameX="-3" frameY="0" frameWidth="289" frameHeight="203"/>
+	<SubTexture name="StickLeft2nd0002" x="0" y="1129" width="288" height="201" frameX="0" frameY="0" frameWidth="289" frameHeight="203"/>
+	<SubTexture name="StickLeft2nd0003" x="0" y="1129" width="288" height="201" frameX="0" frameY="0" frameWidth="289" frameHeight="203"/>
+	<SubTexture name="StickLeft3rd0000" x="288" y="1129" width="396" height="302" frameX="0" frameY="-12" frameWidth="397" frameHeight="319"/>
+	<SubTexture name="StickLeft3rd0001" x="288" y="1129" width="396" height="302" frameX="0" frameY="-12" frameWidth="397" frameHeight="319"/>
+	<SubTexture name="StickLeft3rd0002" x="0" y="1431" width="396" height="319" frameX="-1" frameY="0" frameWidth="397" frameHeight="319"/>
+	<SubTexture name="StickLeft3rd0003" x="0" y="1431" width="396" height="319" frameX="-1" frameY="0" frameWidth="397" frameHeight="319"/>
+	<SubTexture name="StickUp2nd0000" x="396" y="1431" width="266" height="480" frameX="-49" frameY="-53" frameWidth="336" frameHeight="533"/>
+	<SubTexture name="StickUp2nd0001" x="396" y="1431" width="266" height="480" frameX="-49" frameY="-53" frameWidth="336" frameHeight="533"/>
+	<SubTexture name="StickUp2nd0002" x="662" y="1431" width="336" height="530" frameX="0" frameY="0" frameWidth="336" frameHeight="533"/>
+	<SubTexture name="StickUp2nd0003" x="662" y="1431" width="336" height="530" frameX="0" frameY="0" frameWidth="336" frameHeight="533"/>
+</TextureAtlas>
