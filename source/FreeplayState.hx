@@ -65,7 +65,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		if (StoryMenuState.weekUnlocked[2])
-			addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
+			addWeek(['Joe'], 1, ['joestick']);
 
 		if (StoryMenuState.weekUnlocked[2])
 			addWeek(['Spookeez', 'South', 'Monster'], 2, ['spooky', 'spooky', 'monster']);

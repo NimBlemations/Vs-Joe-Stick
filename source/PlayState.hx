@@ -1585,14 +1585,28 @@ class PlayState extends MusicBeatState
 	{
 		if (!_exiting)
 		{
-			vocals.pause();
-	
-			FlxG.sound.music.play();
-			Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
-			if (!vocalsFinished)
+			if (!paused)
 			{
-				vocals.time = Conductor.songPosition;
-				vocals.play();
+				vocals.pause();
+		
+				FlxG.sound.music.play();
+				Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
+				if (!vocalsFinished)
+				{
+					vocals.time = Conductor.songPosition;
+					vocals.play();
+				}
+			}
+			else
+			{
+				FlxG.sound.music.time = Conductor.songPosition + Conductor.offset; // Because I'm getting pissed off at missing after unpausing
+				
+				FlxG.sound.music.play();
+				if (!vocalsFinished)
+				{
+					vocals.time = Conductor.songPosition + Conductor.offset;
+					vocals.play();
+				}
 			}
 		}
 	}

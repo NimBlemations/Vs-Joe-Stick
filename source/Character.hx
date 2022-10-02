@@ -239,8 +239,10 @@ class Character extends FlxSprite
 				quickAnimAdd('idle', 'BF idle dance');
 				quickAnimAdd('singUP', 'BF NOTE UP0');
 				quickAnimAdd('singLEFT', 'BF NOTE LEFT0');
+				quickAnimAdd('singLEFT-1', 'BF NOTE LEFT 2nd0');
 				quickAnimAdd('singRIGHT', 'BF NOTE RIGHT0');
 				quickAnimAdd('singRIGHT-1', 'BF NOTE RIGHT 2nd0');
+				quickAnimAdd('singRIGHT-2', 'BF NOTE RIGHT 3rd0');
 				quickAnimAdd('singDOWN', 'BF NOTE DOWN0');
 				quickAnimAdd('singUPmiss', 'BF NOTE UP MISS');
 				quickAnimAdd('singLEFTmiss', 'BF NOTE LEFT MISS');
