@@ -4,6 +4,7 @@ import animate.FlxAnimate;
 import shaderslmfao.BuildingShaders;
 import ui.PreferencesMenu;
 import shaderslmfao.ColorSwap;
+import shaderslmfao.AngleLighting;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -753,6 +754,12 @@ class PlayState extends MusicBeatState
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
+		
+		if (curStage == 'tank')
+		{
+			var angleLightingShader = new AngleLighting();
+			boyfriend.shader = angleLightingShader.shader;
+		}
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)

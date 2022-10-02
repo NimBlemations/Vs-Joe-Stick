@@ -3,8 +3,12 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 
+import shaderslmfao.ColorSwap;
+
 class NoteSplash extends FlxSprite
 {
+	var colorSwap:ColorSwap;
+	
 	public function new(x:Float, y:Float, ?notedata:Int = 0)
 	{
 		super(x, y);
@@ -22,6 +26,11 @@ class NoteSplash extends FlxSprite
 
 	public function setupNoteSplash(x:Float, y:Float, ?notedata:Int = 0)
 	{
+		// ColorSwap just because
+		colorSwap = new ColorSwap();
+		shader = colorSwap.shader;
+		colorSwap.update(Note.arrowColors[notedata]);
+		
 		setPosition(x, y);
 		alpha = 0.6;
 		animation.play('note' + notedata + '-' + FlxG.random.int(0, 1), true);
