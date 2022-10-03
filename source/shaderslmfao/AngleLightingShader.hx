@@ -21,9 +21,13 @@ class AngleLightingShader extends FlxGraphicsShader
 			vec2 newCoords = vec2(0, 0);
 			
 			if (simple)
+			{
 				newCoords = vec2(openfl_TextureCoordv.x + (angle * 20), openfl_TextureCoordv.y + (angle * 20));
+			}
 			else
+			{
 				newCoords = openfl_TextureCoordv + normalCoords;
+			}
 			
 			vec4 color = texture2D(bitmap, openfl_TextureCoordv);
 			
