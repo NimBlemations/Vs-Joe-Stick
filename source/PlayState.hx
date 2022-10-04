@@ -136,7 +136,11 @@ class PlayState extends MusicBeatState
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
+	var songPotentialScore:Int = 0;
+	var songMisses:Int = 0;
+	var songStaticAccuracy:Float = 0;
 	var scoreTxt:FlxText;
+	var scoreComplex:Bool = PreferencesMenu.getPref('score-complex');
 
 	public static var campaignScore:Int = 0;
 
@@ -155,6 +159,14 @@ class PlayState extends MusicBeatState
 	var detailsText:String = "";
 	var detailsPausedText:String = "";
 	#end
+	
+	static function truncateFloat(number:Float, precision:Int):Float // heheheha stolen from KE 1.8
+	{
+		var num = number;
+		num = num * Math.pow(10, precision);
+		num = Math.round(num) / Math.pow(10, precision);
+		return num;
+	}
 
 	override public function create()
 	{
@@ -891,7 +903,7 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
-		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
+		scoreTxt = new FlxText(healthBarBG.x + (scoreComplex ? (healthBarBG.width / 2) : (healthBarBG.width - 190)), healthBarBG.y + 30, 0, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
@@ -1686,7 +1698,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore;
+		scoreTxt.text = "Score:" + songScore + (PreferencesMenu.getPref('score-complex') ? (" | " + "Misses:" + songMisses + " | " + "Accuracy:" + songStaticAccuracy + "%") : "");
 
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
@@ -2177,7 +2189,17 @@ class PlayState extends MusicBeatState
 		}
 
 		if (!practiceMode)
+		{
 			songScore += score;
+			
+			if (scoreComplex)
+			{
+				songPotentialScore += 350;
+				
+				if (songScore > 0)
+					songStaticAccuracy = truncateFloat((songScore / songPotentialScore) * 100, 2);
+			}
+		}
 
 		/* if (combo > 60)
 				daRating = 'sick';
@@ -2462,6 +2484,15 @@ class PlayState extends MusicBeatState
 		if (!boyfriend.stunned)
 		{
 			health -= 0.04;
+			if (scoreComplex)
+			{
+				++songMisses;
+				songPotentialScore += 350; // Idfk
+				
+				if (songScore > 0)
+					songStaticAccuracy = truncateFloat((songScore / songPotentialScore) * 100, 2);
+			}
+			
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{
 				gf.playAnim('sad');

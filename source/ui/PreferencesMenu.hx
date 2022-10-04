@@ -26,6 +26,7 @@ class PreferencesMenu extends Page
 		add(items = new TextMenuList());
 		createPrefItem('naughtyness', 'censor-naughty', true);
 		createPrefItem('downscroll', 'downscroll', false);
+		createPrefItem('complex scoring layout', 'score-complex', false);
 		createPrefItem('flashing menu', 'flashing-menu', true);
 		createPrefItem('Camera Zooming on Beat', 'camera-zoom', true);
 		createPrefItem('FPS Counter', 'fps-counter', true);
