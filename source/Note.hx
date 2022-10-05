@@ -32,7 +32,7 @@ class Note extends FlxSprite
 	var colorSwap:ColorSwap;
 	
 	public static var swagWidth:Float = 160 * 0.7;
-	public static var arrowColors = [0.075, 0, 0, 0.2];
+	public static var arrowColors = [1, 1, 1, 1]; // [0.1, 0, 0, 0.2]
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
 	public static var BLUE_NOTE:Int = 1;

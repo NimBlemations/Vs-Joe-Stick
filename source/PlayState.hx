@@ -2443,6 +2443,7 @@ class PlayState extends MusicBeatState
 				{
 					if (controlArray[i] && !ignoreList.contains(i))
 					{
+						songPotentialScore += 350;
 						badNoteHit();
 					}
 				}
@@ -2487,7 +2488,6 @@ class PlayState extends MusicBeatState
 			if (scoreComplex)
 			{
 				++songMisses;
-				songPotentialScore += 350; // Idfk
 				
 				if (songScore > 0)
 					songStaticAccuracy = truncateFloat((songScore / songPotentialScore) * 100, 2);
