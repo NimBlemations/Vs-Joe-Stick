@@ -5,6 +5,7 @@ import shaderslmfao.BuildingShaders;
 import ui.PreferencesMenu;
 import shaderslmfao.ColorSwap;
 import shaderslmfao.AngleLighting;
+import shaderslmfao.Blur;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -170,6 +171,8 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
+		super.create();
+		
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -771,8 +774,13 @@ class PlayState extends MusicBeatState
 		
 		if (curStage == 'tank')
 		{
+			/*
 			var angleLightingShader = new AngleLighting();
 			boyfriend.shader = angleLightingShader.shader;
+			*/
+			var blurShader = new Blur();
+			boyfriend.shader  = blurShader.shader;
+			blurShader.update();
 		}
 
 		// REPOSITIONING PER STAGE
@@ -993,8 +1001,6 @@ class PlayState extends MusicBeatState
 					startCountdown();
 			}
 		}
-
-		super.create();
 	}
 
 	function ughIntro():Void
@@ -1351,13 +1357,12 @@ class PlayState extends MusicBeatState
 					oldNote = null;
 
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
-				swagNote.sustainLength = songNotes[2];
 				swagNote.altNote = songNotes[3];
 				if (songNotes[4] != null)
 					swagNote.poseVariation = songNotes[4];
 				swagNote.scrollFactor.set(0, 0);
 
-				var susLength:Float = swagNote.sustainLength;
+				var susLength:Float = songNotes[2];
 
 				susLength /= Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
@@ -1369,6 +1374,8 @@ class PlayState extends MusicBeatState
 					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true, swagNote.poseVariation);
 					sustainNote.scrollFactor.set();
 					unspawnNotes.push(sustainNote);
+					
+					oldNote.sustainLength = songNotes[2];
 
 					sustainNote.mustPress = gottaHitNote;
 
@@ -1955,7 +1962,7 @@ class PlayState extends MusicBeatState
 						if (staticNote.ID == daNote.noteData)
 						{
 							staticNote.animation.play('confirm', true);
-							if (daNote.isSustainNote && !daNote.animation.curAnim.name.endsWith('end') || !daNote.isSustainNote && daNote.sustainLength > 0)
+							if (daNote.sustainLength > 0)
 							{
 								#if debug
 								if (opponentSusArray[daNote.noteData] != true)

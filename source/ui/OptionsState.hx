@@ -15,6 +15,7 @@ class OptionsState extends MusicBeatState
 
 	override function create()
 	{
+		super.create();
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFEA71FD;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
@@ -43,7 +44,6 @@ class OptionsState extends MusicBeatState
 			setPage(Controls);
 		}
 		currentPage.enabled = false;
-		super.create();
 	}
 
 	function addPage(name:PageName, page:Page):Dynamic

@@ -33,6 +33,8 @@ class AnimationDebug extends FlxState
 
 	override function create()
 	{
+		super.create();
+		
 		FlxG.sound.music.stop();
 
 		var gridBG:FlxSprite = FlxGridOverlay.create(10, 10);
@@ -78,8 +80,6 @@ class AnimationDebug extends FlxState
 		add(camFollow);
 
 		FlxG.camera.follow(camFollow);
-
-		super.create();
 	}
 
 	function genBoyOffsets(pushList:Bool = true):Void

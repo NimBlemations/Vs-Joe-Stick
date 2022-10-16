@@ -18,6 +18,10 @@ class MusicBeatState extends FlxUIState
 
 	override function create()
 	{
+		Paths.clearStoredMemory();
+		if ((!Std.isOfType(this, PlayState)) && (!Std.isOfType(this, ChartingState)))
+			Paths.clearUnusedMemory();
+		
 		if (transIn != null)
 			trace('reg ' + transIn.region);
 

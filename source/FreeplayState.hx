@@ -39,6 +39,8 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+		super.create();
+		
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 
 		for (i in 0...initSonglist.length)
@@ -159,8 +161,6 @@ class FreeplayState extends MusicBeatState
 
 			trace(md);
 		 */
-
-		super.create();
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String)

@@ -40,6 +40,8 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
+		super.create();
+		
 		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
@@ -129,8 +131,6 @@ class MainMenuState extends MusicBeatState
 		#if ng
 		versionShit.text += "(Newgrounds exclusive preview)";
 		#end
-
-		super.create();
 	}
 
 	override function finishTransIn()
