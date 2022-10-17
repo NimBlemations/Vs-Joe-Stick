@@ -1,15 +1,21 @@
 package;
 
 import flixel.FlxG;
+#if MEMORY_OPTIMIZATION
 import flixel.graphics.FlxGraphic;
+#end
 import flixel.graphics.frames.FlxAtlasFrames;
+#if MEMORY_OPTIMIZATION
 import lime.utils.Assets;
 import openfl.display3D.textures.Texture;
 import openfl.display.BitmapData;
 import openfl.media.Sound;
+#end
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
+#if MEMORY_OPTIMIZATION
 import openfl.system.System;
+#end
 
 class Paths
 {
@@ -22,6 +28,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 	
+	#if MEMORY_OPTIMIZATION
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 	public static var currentTrackedTextures:Map<String, Texture> = [];
 	public static var currentTrackedSounds:Map<String, Sound> = [];
@@ -103,13 +110,14 @@ class Paths
 		}
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
+		openfl.Assets.cache.clear("songs");
 	}
 	
 	public static function returnGraphic(key:String, ?library:String, ?textureCompression:Bool = false)
 	{
 		var path = getPath('images/$key.png', IMAGE, library);
 		trace(path);
-		if (OpenFlAssets.exists(path, AssetType.IMAGE))
+		if (OpenFlAssets.exists(path, IMAGE))
 		{
 			if (!currentTrackedAssets.exists(key))
 			{
@@ -131,13 +139,14 @@ class Paths
 				}
 				else
 				{
-					newGraphic = FlxGraphic.fromBitmapData(bitmap, false, key, false);
+					newGraphic = FlxG.bitmap.add(path, false, path);
+					newGraphic.persist = true;
 					trace('new bitmap $key, not textured');
 				}
-				currentTrackedAssets.set(key, newGraphic);
+				currentTrackedAssets.set(path, newGraphic);
 			}
-			localTrackedAssets.push(key);
-			return currentTrackedAssets.get(key);
+			localTrackedAssets.push(path);
+			return currentTrackedAssets.get(path);
 		}
 		trace('oh no ' + key + ' is returning null NOOOO');
 		return null;
@@ -150,10 +159,11 @@ class Paths
 		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
 		// trace(gottenPath);
 		if (!currentTrackedSounds.exists(gottenPath))
-			currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
-		localTrackedAssets.push(key);
+			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(getPath(gottenPath, SOUND, library)));
+		localTrackedAssets.push(gottenPath);
 		return currentTrackedSounds.get(gottenPath);
 	}
+	#end
 
 	static public function getPath(file:String, type:AssetType, library:Null<String>)
 	{
@@ -162,9 +172,12 @@ class Paths
 
 		if (currentLevel != null)
 		{
-			var levelPath = getLibraryPathForce(file, currentLevel);
-			if (OpenFlAssets.exists(levelPath, type))
-				return levelPath;
+			var levelPath:String = "";
+			if (currentLevel != "shared") {
+				levelPath = getLibraryPathForce(file, currentLevel);
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+			}
 
 			levelPath = getLibraryPathForce(file, "shared");
 			if (OpenFlAssets.exists(levelPath, type))
@@ -181,7 +194,8 @@ class Paths
 
 	inline static function getLibraryPathForce(file:String, library:String)
 	{
-		return '$library:assets/$library/$file';
+		var returnPath = '$library:assets/$library/$file';
+		return returnPath;
 	}
 
 	inline static function getPreloadPath(file:String)
@@ -211,8 +225,12 @@ class Paths
 
 	static public function sound(key:String, ?library:String)
 	{
+		#if MEMORY_OPTIMIZATION
 		var sound:Sound = returnSound('sounds', key, library);
 		return sound;
+		#else
+		return getPath('sounds/$key.$SOUND_EXT', SOUND, library);
+		#end
 	}
 
 	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String)
@@ -222,28 +240,44 @@ class Paths
 
 	inline static public function music(key:String, ?library:String):Dynamic
 	{
+		#if MEMORY_OPTIMIZATION
 		var file:Sound = returnSound('music', key, library);
 		return file;
+		#else
+		return getPath('music/$key.$SOUND_EXT', MUSIC, library)
+		#end
 	}
 
 	inline static public function voices(song:String):Any
 	{
+		#if MEMORY_OPTIMIZATION
 		var songKey:String = '${song.toLowerCase()}/Voices.$SOUND_EXT';
 		var voices = returnSound('songs', songKey);
 		return voices;
+		#else
+		return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		#end
 	}
 
 	inline static public function inst(song:String):Any
 	{
+		#if MEMORY_OPTIMIZATION
 		var songKey:String = '${song.toLowerCase()}/Inst.$SOUND_EXT';
 		var inst = returnSound('songs', songKey);
 		return inst;
+		#else
+		return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		#end
 	}
 
 	inline static public function image(key:String, ?library:String, ?textureCompression:Bool = false)
 	{
+		#if MEMORY_OPTIMIZATION
 		var returnAsset:FlxGraphic = returnGraphic(key, library, textureCompression);
 		return returnAsset;
+		#else
+		return getPath('images/$key.png', IMAGE, library);
+		#end
 	}
 
 	inline static public function font(key:String)
@@ -258,8 +292,12 @@ class Paths
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
+		#if MEMORY_OPTIMIZATION
 		var graphic:FlxGraphic = returnGraphic(key, library);
 		return FlxAtlasFrames.fromSparrow(graphic, file('images/$key.xml', library));
+		#else
+		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
+		#end
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String)
