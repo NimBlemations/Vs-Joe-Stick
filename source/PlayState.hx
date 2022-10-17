@@ -1551,7 +1551,7 @@ class PlayState extends MusicBeatState
 		{
 			if (FlxG.sound.music != null && !startingSong)
 			{
-				resyncVocals();
+				resyncSong();
 			}
 
 			if (!startTimer.finished)
@@ -1602,30 +1602,34 @@ class PlayState extends MusicBeatState
 	}
 	#end
 
-	function resyncVocals():Void
+	function resyncSong():Void
 	{
 		if (!_exiting)
 		{
 			if (!paused)
 			{
+				#if debug
+				trace('resync to ${Conductor.songPosition - Conductor.offset} (${Conductor.offset})');
+				#end
+				FlxG.sound.music.pause();
+				FlxG.sound.music.time = Conductor.songPosition - Conductor.offset; // Smooth n' stuff!
+				
 				vocals.pause();
-		
 				FlxG.sound.music.play();
-				Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 				if (!vocalsFinished)
 				{
-					vocals.time = Conductor.songPosition;
+					vocals.time = Conductor.songPosition - Conductor.offset;
 					vocals.play();
 				}
 			}
 			else
 			{
-				FlxG.sound.music.time = Conductor.songPosition + Conductor.offset; // Because I'm getting pissed off at missing after unpausing
+				FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
 				
 				FlxG.sound.music.play();
 				if (!vocalsFinished)
 				{
-					vocals.time = Conductor.songPosition + Conductor.offset;
+					vocals.time = Conductor.songPosition - Conductor.offset;
 					vocals.play();
 				}
 			}
@@ -2713,10 +2717,10 @@ class PlayState extends MusicBeatState
 	override function stepHit()
 	{
 		super.stepHit();
-		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
-			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
+		if (Math.abs((Conductor.songPosition - Conductor.offset) - FlxG.sound.music.time) > 20
+			|| (SONG.needsVoices && Math.abs((Conductor.songPosition - Conductor.offset) - vocals.time) > 20))
 		{
-			resyncVocals();
+			resyncSong();
 		}
 
 		if (dad.curCharacter == 'spooky' && curStep % 4 == 2)

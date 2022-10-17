@@ -244,7 +244,7 @@ class Paths
 		var file:Sound = returnSound('music', key, library);
 		return file;
 		#else
-		return getPath('music/$key.$SOUND_EXT', MUSIC, library)
+		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
 		#end
 	}
 
