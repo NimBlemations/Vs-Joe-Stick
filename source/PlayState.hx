@@ -1289,7 +1289,7 @@ class PlayState extends MusicBeatState
 
 		if (!paused)
 			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-		FlxG.sound.music.onComplete = endSong;
+		// FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
 		#if desktop
@@ -1357,12 +1357,13 @@ class PlayState extends MusicBeatState
 					oldNote = null;
 
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				swagNote.sustainLength = songNotes[2];
 				swagNote.altNote = songNotes[3];
 				if (songNotes[4] != null)
 					swagNote.poseVariation = songNotes[4];
 				swagNote.scrollFactor.set(0, 0);
 
-				var susLength:Float = songNotes[2];
+				var susLength:Float = swagNote.sustainLength;
 
 				susLength /= Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
@@ -1375,7 +1376,7 @@ class PlayState extends MusicBeatState
 					sustainNote.scrollFactor.set();
 					unspawnNotes.push(sustainNote);
 					
-					oldNote.sustainLength = songNotes[2];
+					
 
 					sustainNote.mustPress = gottaHitNote;
 
@@ -1609,7 +1610,7 @@ class PlayState extends MusicBeatState
 			if (!paused)
 			{
 				#if debug
-				trace('resync to ${Conductor.songPosition - Conductor.offset} (${Conductor.offset})');
+				trace('resync to ${Conductor.songPosition - Conductor.offset} (${Conductor.offset}) (${(Conductor.songPosition - Conductor.offset) - vocals.time})');
 				#end
 				FlxG.sound.music.pause();
 				FlxG.sound.music.time = Conductor.songPosition - Conductor.offset; // Smooth n' stuff!
@@ -1667,8 +1668,8 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
-			Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
-			// Conductor.songPosition += FlxG.elapsed * 1000;
+			// Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
+			Conductor.songPosition += elapsed * 1000;
 
 			if (!paused)
 			{
@@ -1683,6 +1684,13 @@ class PlayState extends MusicBeatState
 					// Conductor.songPosition += FlxG.elapsed * 1000;
 					// trace('MISSED FRAME');
 				}
+			}
+			
+			if (Conductor.songPosition >= songLength && !endingSong)
+			{
+				FlxG.sound.music.stop();
+				endingSong = true;
+				endSong();
 			}
 
 			// Conductor.lastSongPos = FlxG.sound.music.time;
@@ -1709,7 +1717,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore + (PreferencesMenu.getPref('score-complex') ? (" | " + "Misses:" + songMisses + " | " + "Accuracy:" + songStaticAccuracy + "%") : "");
+		scoreTxt.text = "Score:" + songScore + (PreferencesMenu.getPref('score-complex') ? ((songPotentialScore != songScore ? ("(" + songPotentialScore + ")") : "") + " | " + "Misses:" + songMisses + " | " + "Accuracy:" + songStaticAccuracy + "%") : "");
 
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
@@ -1966,7 +1974,7 @@ class PlayState extends MusicBeatState
 						if (staticNote.ID == daNote.noteData)
 						{
 							staticNote.animation.play('confirm', true);
-							if (daNote.sustainLength > 0)
+							if (daNote.noteStatus > 1)
 							{
 								#if debug
 								if (opponentSusArray[daNote.noteData] != true)

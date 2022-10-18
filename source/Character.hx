@@ -23,7 +23,11 @@ class Character extends FlxSprite
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
-
+		setCharacter(x, y, character, isPlayer); // bruh lmao
+	}
+	
+	public function setCharacter(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
+	{
 		animOffsets = new Map<String, Array<Dynamic>>();
 		curCharacter = character;
 		this.isPlayer = isPlayer;
