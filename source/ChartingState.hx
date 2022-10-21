@@ -203,6 +203,11 @@ class ChartingState extends MusicBeatState
 		{
 			saveLevel();
 		});
+		
+		var saveChartButton:FlxButton = new FlxButton(saveButton.x, saveButton.y + 30, "Save To .chart", function()
+		{
+			saveChartLevel();
+		});
 
 		var reloadSong:FlxButton = new FlxButton(saveButton.x + saveButton.width + 10, saveButton.y, "Reload Audio", function()
 		{
@@ -248,6 +253,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(check_voices);
 		tab_group_song.add(check_mute_inst);
 		tab_group_song.add(saveButton);
+		tab_group_song.add(saveChartButton);
 		tab_group_song.add(reloadSong);
 		tab_group_song.add(reloadSongJson);
 		tab_group_song.add(loadAutosaveBtn);
@@ -1088,6 +1094,49 @@ class ChartingState extends MusicBeatState
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 			_file.save(data.trim(), _song.song.toLowerCase() + ".json");
+		}
+	}
+	
+	private function saveChartLevel()
+	{
+		var stringleDingle:String = "";
+		
+		var iteratorThing:Int = 0;
+		for (i in _song.notes)
+		{
+			var prevStatus:Int = 1;
+			stringleDingle += ':$iteratorThing';
+			if (i.sectionNotes.length > 0)
+			{
+				for (note in i.sectionNotes)
+				{
+					var noteArray:Array<Dynamic> = note;
+					if (prevStatus == 2)
+					{
+						stringleDingle += ";";
+						prevStatus = 3;
+					}
+					for (notePart in noteArray)
+					{
+						if (prevStatus == 2)
+							stringleDingle += ",";
+						else
+							prevStatus = 2;
+						
+						stringleDingle += notePart;
+					}
+				}
+			}
+			iteratorThing++;
+		}
+		
+		if ((stringleDingle != null) && (stringleDingle.length > 0))
+		{
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(stringleDingle.trim(), _song.song.toLowerCase() + ".chart");
 		}
 	}
 

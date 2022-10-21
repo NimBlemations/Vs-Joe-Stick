@@ -1613,24 +1613,24 @@ class PlayState extends MusicBeatState
 				trace('resync to ${Conductor.songPosition - Conductor.offset} (${Conductor.offset}) (${(Conductor.songPosition - Conductor.offset) - vocals.time})');
 				#end
 				FlxG.sound.music.pause();
-				FlxG.sound.music.time = Conductor.songPosition - Conductor.offset; // Smooth n' stuff!
+				FlxG.sound.music.time = Math.round(Conductor.songPosition - Conductor.offset); // Smooth n' stuff!
 				
 				vocals.pause();
 				FlxG.sound.music.play();
 				if (!vocalsFinished)
 				{
-					vocals.time = Conductor.songPosition - Conductor.offset;
+					vocals.time = Math.round(Conductor.songPosition - Conductor.offset);
 					vocals.play();
 				}
 			}
 			else
 			{
-				FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
+				FlxG.sound.music.time = Math.round(Conductor.songPosition - Conductor.offset);
 				
 				FlxG.sound.music.play();
 				if (!vocalsFinished)
 				{
-					vocals.time = Conductor.songPosition - Conductor.offset;
+					vocals.time = Math.round(Conductor.songPosition - Conductor.offset);
 					vocals.play();
 				}
 			}
