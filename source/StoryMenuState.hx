@@ -57,6 +57,8 @@ class StoryMenuState extends MusicBeatState
 	{
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
+		
+		super.create();
 
 		if (FlxG.sound.music != null)
 		{
@@ -199,8 +201,6 @@ class StoryMenuState extends MusicBeatState
 		updateText();
 
 		trace("Line 165");
-
-		super.create();
 	}
 
 	override function update(elapsed:Float)
