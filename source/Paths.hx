@@ -54,28 +54,16 @@ class Paths
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
 				var obj = currentTrackedAssets.get(key);
+				@:privateAccess
 				if (obj != null)
 				{
-					var isTexture:Bool = currentTrackedTextures.exists(key);
-					if (isTexture)
-					{
-						var texture = currentTrackedTextures.get(key);
-						texture.dispose();
-						texture = null;
-						currentTrackedTextures.remove(key);
-					}
-					@:privateAccess
-					if (openfl.Assets.cache.hasBitmapData(key))
-					{
-						openfl.Assets.cache.removeBitmapData(key);
-						FlxG.bitmap._cache.remove(key);
-					}
-					trace('removed $key, ' + (isTexture ? 'is a texture' : 'is not a texture'));
+					openfl.Assets.cache.removeBitmapData(key);
+					FlxG.bitmap._cache.remove(key);
 					obj.destroy();
 					currentTrackedAssets.remove(key);
-					counter++;
 				}
 			}
+			counter++;
 		}
 		trace('removed $counter assets');
 		// run the garbage collector for good measure lmfao
@@ -113,42 +101,27 @@ class Paths
 		openfl.Assets.cache.clear("songs");
 	}
 	
-	public static function returnGraphic(key:String, ?library:String, ?textureCompression:Bool = false)
+	public static function returnGraphic(key:String, ?library:String)
 	{
 		var path = getPath('images/$key.png', IMAGE, library);
+		#if debug
 		trace(path);
+		#end
 		if (OpenFlAssets.exists(path, IMAGE))
 		{
 			if (!currentTrackedAssets.exists(key))
 			{
-				var imgPath = path;
-				if (imgPath.split(":")[1] != null)
-					imgPath = imgPath.split(":")[1];
-				var bitmap = BitmapData.fromFile(imgPath);
-				var newGraphic:FlxGraphic;
-				if (textureCompression)
+				if (!currentTrackedAssets.exists(path))
 				{
-					var texture = FlxG.stage.context3D.createTexture(bitmap.width, bitmap.height, BGRA, true, 0);
-					texture.uploadFromBitmapData(bitmap);
-					currentTrackedTextures.set(key, texture);
-					bitmap.dispose();
-					bitmap.disposeImage();
-					bitmap = null;
-					trace('new texture $key, bitmap is $bitmap');
-					newGraphic = FlxGraphic.fromBitmapData(BitmapData.fromTexture(texture), false, key, false);
-				}
-				else
-				{
-					newGraphic = FlxG.bitmap.add(path, false, path);
+					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
-					trace('new bitmap $key, not textured');
+					currentTrackedAssets.set(path, newGraphic);
 				}
-				currentTrackedAssets.set(path, newGraphic);
 			}
 			localTrackedAssets.push(path);
 			return currentTrackedAssets.get(path);
 		}
-		trace('oh no ' + key + ' is returning null NOOOO');
+		trace('oh no $key is returning null NOOOO');
 		return null;
 	}
 	
@@ -159,7 +132,7 @@ class Paths
 		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
 		// trace(gottenPath);
 		if (!currentTrackedSounds.exists(gottenPath))
-			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(getPath(gottenPath, SOUND, library)));
+			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(getPath('$path/$key.$SOUND_EXT', SOUND, library)));
 		localTrackedAssets.push(gottenPath);
 		return currentTrackedSounds.get(gottenPath);
 	}
@@ -172,8 +145,8 @@ class Paths
 
 		if (currentLevel != null)
 		{
-			var levelPath:String = "";
-			if (currentLevel != "shared") {
+			var levelPath:String = '';
+			if (currentLevel != 'shared') {
 				levelPath = getLibraryPathForce(file, currentLevel);
 				if (OpenFlAssets.exists(levelPath, type))
 					return levelPath;
@@ -223,7 +196,7 @@ class Paths
 		return getPath('data/$key.json', TEXT, library);
 	}
 
-	static public function sound(key:String, ?library:String)
+	static public function sound(key:String, ?library:String) #if MEMORY_OPTIMIZATION :Sound #end
 	{
 		#if MEMORY_OPTIMIZATION
 		var sound:Sound = returnSound('sounds', key, library);
@@ -238,7 +211,7 @@ class Paths
 		return sound(key + FlxG.random.int(min, max), library);
 	}
 
-	inline static public function music(key:String, ?library:String):Dynamic
+	inline static public function music(key:String, ?library:String):Sound
 	{
 		#if MEMORY_OPTIMIZATION
 		var file:Sound = returnSound('music', key, library);
@@ -251,7 +224,7 @@ class Paths
 	inline static public function voices(song:String):Any
 	{
 		#if MEMORY_OPTIMIZATION
-		var songKey:String = '${song.toLowerCase()}/Voices.$SOUND_EXT';
+		var songKey:String = '${song.toLowerCase()}/Voices';
 		var voices = returnSound('songs', songKey);
 		return voices;
 		#else
@@ -262,7 +235,7 @@ class Paths
 	inline static public function inst(song:String):Any
 	{
 		#if MEMORY_OPTIMIZATION
-		var songKey:String = '${song.toLowerCase()}/Inst.$SOUND_EXT';
+		var songKey:String = '${song.toLowerCase()}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
 		#else
@@ -270,10 +243,10 @@ class Paths
 		#end
 	}
 
-	inline static public function image(key:String, ?library:String, ?textureCompression:Bool = false)
+	inline static public function image(key:String, ?library:String) #if MEMORY_OPTIMIZATION :FlxGraphic #end
 	{
 		#if MEMORY_OPTIMIZATION
-		var returnAsset:FlxGraphic = returnGraphic(key, library, textureCompression);
+		var returnAsset:FlxGraphic = returnGraphic(key, library);
 		return returnAsset;
 		#else
 		return getPath('images/$key.png', IMAGE, library);

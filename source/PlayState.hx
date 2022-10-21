@@ -160,14 +160,6 @@ class PlayState extends MusicBeatState
 	var detailsText:String = "";
 	var detailsPausedText:String = "";
 	#end
-	
-	static function truncateFloat(number:Float, precision:Int):Float // heheheha stolen from KE 1.8
-	{
-		var num = number;
-		num = num * Math.pow(10, precision);
-		num = Math.round(num) / Math.pow(10, precision);
-		return num;
-	}
 
 	override public function create()
 	{
@@ -2216,7 +2208,7 @@ class PlayState extends MusicBeatState
 				songPotentialScore += 350;
 				
 				if (songScore > 0)
-					songStaticAccuracy = truncateFloat((songScore / songPotentialScore) * 100, 2);
+					songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
 			}
 		}
 
@@ -2509,7 +2501,7 @@ class PlayState extends MusicBeatState
 				++songMisses;
 				
 				if (songScore > 0)
-					songStaticAccuracy = truncateFloat((songScore / songPotentialScore) * 100, 2);
+					songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
 			}
 			
 			if (combo > 5 && gf.animOffsets.exists('sad'))

@@ -1105,7 +1105,7 @@ class ChartingState extends MusicBeatState
 		for (i in _song.notes)
 		{
 			var prevStatus:Int = 1;
-			stringleDingle += ':$iteratorThing';
+			stringleDingle += '!${iteratorThing}!';
 			if (i.sectionNotes.length > 0)
 			{
 				for (note in i.sectionNotes)
@@ -1113,7 +1113,7 @@ class ChartingState extends MusicBeatState
 					var noteArray:Array<Dynamic> = note;
 					if (prevStatus == 2)
 					{
-						stringleDingle += ";";
+						stringleDingle += "@";
 						prevStatus = 3;
 					}
 					for (notePart in noteArray)
