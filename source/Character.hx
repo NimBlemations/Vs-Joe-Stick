@@ -1,6 +1,7 @@
 package;
 
 import Section.SwagSection;
+import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.animation.FlxBaseAnimation;
@@ -15,6 +16,7 @@ class Character extends FlxSprite
 
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = 'bf';
+	public var barColor:FlxColor;
 
 	public var holdTimer:Float = 0;
 	
@@ -23,6 +25,8 @@ class Character extends FlxSprite
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
+		
+		barColor = isPlayer ? 0xFF66FF33 : 0xFFFF0000;
 		setCharacter(x, y, character, isPlayer); // bruh lmao
 	}
 	
@@ -34,6 +38,7 @@ class Character extends FlxSprite
 
 		var tex:FlxAtlasFrames;
 		antialiasing = true;
+		
 
 		switch (curCharacter)
 		{
@@ -54,6 +59,7 @@ class Character extends FlxSprite
 				animation.addByPrefix('scared', 'GF FEAR', 24, true);
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFA5004D;
 
 				playAnim('danceRight');
 
@@ -124,6 +130,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singLEFT', 'Dad Sing Note LEFT');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFaf66ce;
 
 				playAnim('idle');
 			case 'spooky':
@@ -137,6 +144,7 @@ class Character extends FlxSprite
 				animation.addByIndices('danceRight', 'spooky dance idle', [8, 10, 12, 14], "", 12, false);
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFd57e00;
 
 				playAnim('danceRight');
 			case 'mom':
@@ -152,6 +160,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singRIGHT', 'Mom Pose Left');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFd8558e;
 
 				playAnim('idle');
 
@@ -169,6 +178,7 @@ class Character extends FlxSprite
 				animation.addByIndices('idleHair', 'Mom Idle', [10, 11, 12, 13], '', 24, true);
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFd8558e;
 
 				playAnim('idle');
 			case 'monster':
@@ -181,6 +191,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singRIGHT', 'Monster Right note');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFf3ff6e;
 				playAnim('idle');
 			case 'monster-christmas':
 				tex = Paths.getSparrowAtlas('characters/monsterChristmas');
@@ -192,6 +203,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singRIGHT', 'Monster Right note');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFf3ff6e;
 				playAnim('idle');
 			case 'pico':
 				tex = Paths.getSparrowAtlas('characters/Pico_FNF_assetss');
@@ -219,6 +231,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singDOWNmiss', 'Pico Down Note MISS');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFb7d855;
 
 				playAnim('idle');
 
@@ -263,6 +276,8 @@ class Character extends FlxSprite
 				loadOffsetFile(curCharacter);
 
 				playAnim('idle');
+				
+				barColor = 0xFF31b0d1;
 
 				flipX = true;
 				
@@ -285,6 +300,8 @@ class Character extends FlxSprite
 				loadOffsetFile(curCharacter);
 
 				playAnim('idle');
+				
+				barColor = 0xFF31b0d1;
 
 				flipX = true;
 			case 'bf-car':
@@ -305,6 +322,8 @@ class Character extends FlxSprite
 				loadOffsetFile(curCharacter);
 				
 				playAnim('idle');
+				
+				barColor = 0xFF31b0d1;
 
 				flipX = true;
 			case 'bf-pixel':
@@ -330,6 +349,8 @@ class Character extends FlxSprite
 				height -= 100;
 
 				antialiasing = false;
+				
+				barColor = 0xFF7bd6f6;
 
 				flipX = true;
 			case 'bf-pixel-dead':
@@ -364,6 +385,8 @@ class Character extends FlxSprite
 				loadOffsetFile(curCharacter);
 
 				playAnim('idle');
+				
+				barColor = 0xFF31b0d1;
 
 				flipX = true;
 			case 'bf-holding-gf-dead':
@@ -392,6 +415,8 @@ class Character extends FlxSprite
 				loadOffsetFile(curCharacter);
 				
 				playAnim('idle');
+				
+				barColor = 0xFFFFFFFF;
 
 			case 'senpai':
 				frames = Paths.getSparrowAtlas('characters/senpai');
@@ -402,6 +427,8 @@ class Character extends FlxSprite
 				quickAnimAdd('singDOWN', 'SENPAI DOWN NOTE');
 
 				loadOffsetFile(curCharacter);
+				
+				barColor = 0xFFffaa6f;
 
 				playAnim('idle');
 
@@ -418,6 +445,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singDOWN', 'Angry Senpai DOWN NOTE');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFffaa6f;
 				playAnim('idle');
 
 				setGraphicSize(Std.int(width * 6));
@@ -434,6 +462,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singDOWN', "spirit down_");
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFFff3c6e;
 
 				setGraphicSize(Std.int(width * 6));
 				updateHitbox();
@@ -457,6 +486,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singRIGHT-alt', 'Parent Right Note Mom');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFF9a00f8;
 
 				playAnim('idle');
 
@@ -486,6 +516,7 @@ class Character extends FlxSprite
 				quickAnimAdd('singUP-alt', 'TANKMAN UGH');
 
 				loadOffsetFile(curCharacter);
+				barColor = 0xFF000000;
 
 				playAnim('idle');
 

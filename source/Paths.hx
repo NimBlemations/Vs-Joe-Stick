@@ -141,6 +141,28 @@ class Paths
 		return currentTrackedSounds.get(gottenPath);
 	}
 	#end
+	
+	public static function preloadGraphic(key:String, ?library:String)
+	{
+		#if MEMORY_OPTIMIZATION
+		var path = getPath('images/$key.png', IMAGE, library);
+		if (OpenFlAssets.exists(path, IMAGE))
+		{
+			if (!currentTrackedAssets.exists(key))
+			{
+				if (!currentTrackedAssets.exists(path))
+				{
+					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
+					newGraphic.persist = true;
+					currentTrackedAssets.set(path, newGraphic);
+				}
+			}
+		}
+		trace('oh no $key is null NOOOO');
+		#else
+		trace('penis ($key $library)');
+		#end
+	}
 
 	static public function getPath(file:String, type:AssetType, library:Null<String>)
 	{

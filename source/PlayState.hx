@@ -6,6 +6,7 @@ import ui.PreferencesMenu;
 import shaderslmfao.ColorSwap;
 import shaderslmfao.AngleLighting;
 import shaderslmfao.Blur;
+import shaderslmfao.SquareBlur;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -184,9 +185,13 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.add(camHUD, false);
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
+		#if MEMORY_OPTIMIZATION
 		var splash:NoteSplash = new NoteSplash(100, 100, 0);
 		grpNoteSplashes.add(splash);
 		splash.alpha = 0.1;
+		#else
+		Paths.preloadGraphic('noteSplashes'); // I'm just cool that way B')
+		#end
 
 		persistentUpdate = true;
 		persistentDraw = true;
@@ -771,7 +776,7 @@ class PlayState extends MusicBeatState
 			boyfriend.shader = angleLightingShader.shader;
 			*/
 			var blurShader = new Blur();
-			boyfriend.shader  = blurShader.shader;
+			boyfriend.shader = blurShader.shader;
 			blurShader.update();
 		}
 
@@ -899,7 +904,7 @@ class PlayState extends MusicBeatState
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
+		healthBar.createFilledBar(dad.barColor, boyfriend.barColor);
 		// healthBar
 		add(healthBar);
 
@@ -2493,16 +2498,16 @@ class PlayState extends MusicBeatState
 
 	function noteMiss(direction:Int = 1):Void
 	{
+		if (scoreComplex)
+		{
+			++songMisses;
+			
+			if (songScore > 0)
+				songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+		}
 		if (!boyfriend.stunned)
 		{
 			health -= 0.04;
-			if (scoreComplex)
-			{
-				++songMisses;
-				
-				if (songScore > 0)
-					songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
-			}
 			
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{

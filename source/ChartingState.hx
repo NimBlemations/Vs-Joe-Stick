@@ -83,6 +83,8 @@ class ChartingState extends MusicBeatState
 
 	override function create()
 	{
+		super.create();
+		
 		curSection = lastSection;
 
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 16);
@@ -170,7 +172,6 @@ class ChartingState extends MusicBeatState
 		add(curRenderedSustains);
 
 		changeSection();
-		super.create();
 	}
 
 	function addSongUI():Void
