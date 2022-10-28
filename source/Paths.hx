@@ -152,13 +152,15 @@ class Paths
 			{
 				if (!currentTrackedAssets.exists(path))
 				{
+					trace('preloading $key');
 					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
 					currentTrackedAssets.set(path, newGraphic);
 				}
 			}
 		}
-		trace('oh no $key is null NOOOO');
+		else
+			trace('oh no $key is null NOOOO');
 		#else
 		trace('penis ($key $library)');
 		#end

@@ -186,11 +186,11 @@ class PlayState extends MusicBeatState
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 		#if MEMORY_OPTIMIZATION
+		Paths.preloadGraphic('noteSplashes'); // I'm just cool that way B')
+		#else
 		var splash:NoteSplash = new NoteSplash(100, 100, 0);
 		grpNoteSplashes.add(splash);
 		splash.alpha = 0.1;
-		#else
-		Paths.preloadGraphic('noteSplashes'); // I'm just cool that way B')
 		#end
 
 		persistentUpdate = true;
@@ -1164,6 +1164,29 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition -= Conductor.crochet * 5;
 
 		var swagCounter:Int = 0;
+		
+		var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
+		introAssets.set('default', ['ready', "set", "go"]);
+		introAssets.set('school', ['weeb/pixelUI/ready-pixel', 'weeb/pixelUI/set-pixel', 'weeb/pixelUI/date-pixel']);
+		introAssets.set('schoolEvil', ['weeb/pixelUI/ready-pixel', 'weeb/pixelUI/set-pixel', 'weeb/pixelUI/date-pixel']);
+
+		var introAlts:Array<String> = introAssets.get('default');
+		var altSuffix:String = "";
+
+		for (value in introAssets.keys())
+		{
+			if (value == curStage)
+			{
+				introAlts = introAssets.get(value);
+				altSuffix = '-pixel';
+			}
+		}
+		
+		#if MEMORY_OPTIMIZATION
+		Paths.preloadGraphic(introAlts[0]);
+		Paths.preloadGraphic(introAlts[1]);
+		Paths.preloadGraphic(introAlts[2]);
+		#end
 
 		startTimer.start(Conductor.crochet / 1000, function(tmr:FlxTimer)
 		{
@@ -1188,24 +1211,7 @@ class PlayState extends MusicBeatState
 					return sortNotes(FlxSort.DESCENDING, Obj1, Obj2);
 				});
 			}
-
-			var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
-			introAssets.set('default', ['ready', "set", "go"]);
-			introAssets.set('school', ['weeb/pixelUI/ready-pixel', 'weeb/pixelUI/set-pixel', 'weeb/pixelUI/date-pixel']);
-			introAssets.set('schoolEvil', ['weeb/pixelUI/ready-pixel', 'weeb/pixelUI/set-pixel', 'weeb/pixelUI/date-pixel']);
-
-			var introAlts:Array<String> = introAssets.get('default');
-			var altSuffix:String = "";
-
-			for (value in introAssets.keys())
-			{
-				if (value == curStage)
-				{
-					introAlts = introAssets.get(value);
-					altSuffix = '-pixel';
-				}
-			}
-
+			
 			switch (swagCounter)
 
 			{
