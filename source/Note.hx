@@ -22,6 +22,7 @@ class Note extends FlxSprite
 	public var canBeHit:Bool = false;
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
+	public var sickChanced:Bool = false;
 	public var willMiss:Bool = false;
 	public var altNote:Bool = false;
 	public var poseVariation:Int = 0;
@@ -194,7 +195,7 @@ class Note extends FlxSprite
 
 		if (mustPress)
 		{
-			if (willMiss && !wasGoodHit)
+			if (willMiss)
 			{
 				tooLate = true;
 				canBeHit = false;
@@ -226,5 +227,8 @@ class Note extends FlxSprite
 			if (alpha > 0.3)
 				alpha = 0.3;
 		}
+		
+		if (strumTime <= Conductor.songPosition)
+			sickChanced = true;
 	}
 }

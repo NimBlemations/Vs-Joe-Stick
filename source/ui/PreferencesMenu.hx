@@ -18,6 +18,8 @@ class PreferencesMenu extends Page
 
 	override public function new()
 	{
+		if (FlxG.save.data.preferences != null)
+			preferences = FlxG.save.data.preferences;
 		super();
 		menuCamera = new FlxCamera();
 		FlxG.cameras.add(menuCamera, false);
@@ -27,6 +29,7 @@ class PreferencesMenu extends Page
 		createPrefItem('naughtyness', 'censor-naughty', true);
 		createPrefItem('downscroll', 'downscroll', false);
 		createPrefItem('complex scoring layout', 'score-complex', false);
+		createPrefItem('botplay', 'player-botplay', false);
 		createPrefItem('flashing menu', 'flashing-menu', true);
 		createPrefItem('Camera Zooming on Beat', 'camera-zoom', true);
 		createPrefItem('FPS Counter', 'fps-counter', true);
@@ -52,13 +55,20 @@ class PreferencesMenu extends Page
 
 	public static function initPrefs()
 	{
-		preferenceCheck('censor-naughty', true);
-		preferenceCheck('downscroll', false);
-		preferenceCheck('flashing-menu', true);
-		preferenceCheck('camera-zoom', true);
-		preferenceCheck('fps-counter', true);
-		preferenceCheck('auto-pause', false);
-		preferenceCheck('master-volume', 1);
+		if (FlxG.save.data.preferences != null)
+			preferences = FlxG.save.data.preferences;
+		else
+		{
+			preferenceCheck('censor-naughty', true);
+			preferenceCheck('downscroll', false);
+			preferenceCheck('score-complex', false);
+			preferenceCheck('player-botplay', false);
+			preferenceCheck('flashing-menu', true);
+			preferenceCheck('camera-zoom', true);
+			preferenceCheck('fps-counter', true);
+			preferenceCheck('auto-pause', false);
+			preferenceCheck('master-volume', 1);
+		}
 		if (!getPref('fps-counter'))
 		{
 			Lib.current.stage.removeChild(Main.fpsCounter);
@@ -141,5 +151,15 @@ class PreferencesMenu extends Page
 			else
 				item.x = 120;
 		});
+	}
+	
+	override function destroy()
+	{
+		FlxG.save.data.preferences = preferences;
+		FlxG.save.flush();
+		#if debug
+		trace('deez');
+		#end
+		super.destroy();
 	}
 }

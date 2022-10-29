@@ -34,7 +34,14 @@ class NoteSplash extends FlxSprite
 		setPosition(x, y);
 		alpha = 0.6;
 		animation.play('note' + notedata + '-' + FlxG.random.int(0, 1), true);
-		animation.curAnim.frameRate += FlxG.random.int(-2, 2);
+		try
+		{
+			animation.curAnim.frameRate += FlxG.random.int( -2, 2);
+		}
+		catch (e)
+		{
+			trace('fuck $e');
+		}
 		updateHitbox();
 		offset.set(width * 0.3, height * 0.3);
 	}

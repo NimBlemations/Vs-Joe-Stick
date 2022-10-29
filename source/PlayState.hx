@@ -143,6 +143,8 @@ class PlayState extends MusicBeatState
 	var songStaticAccuracy:Float = 0;
 	var scoreTxt:FlxText;
 	var scoreComplex:Bool = PreferencesMenu.getPref('score-complex');
+	
+	var playerBotplay:Bool = PreferencesMenu.getPref('player-botplay');
 
 	public static var campaignScore:Int = 0;
 
@@ -165,6 +167,10 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		super.create();
+		
+		#if debug
+		trace('botplay be $playerBotplay me boy');
+		#end
 		
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -909,7 +915,7 @@ class PlayState extends MusicBeatState
 		add(healthBar);
 
 		scoreTxt = new FlxText(healthBarBG.x + (scoreComplex ? (healthBarBG.width / 2) : (healthBarBG.width - 190)), healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, OUTLINE, FlxColor.BLACK);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, (scoreComplex ? CENTER : RIGHT), OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
@@ -1720,7 +1726,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore + (PreferencesMenu.getPref('score-complex') ? ((songPotentialScore != songScore ? ("(" + songPotentialScore + ")") : "") + " | " + "Misses:" + songMisses + " | " + "Accuracy:" + songStaticAccuracy + "%") : "");
+		scoreTxt.text = "Score:" + songScore + (scoreComplex ? ((songPotentialScore != songScore ? ("(" + songPotentialScore + ")") : "") + " | " + "Misses:" + songMisses + " | " + "Accuracy:" + songStaticAccuracy + "%") : "");
 
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
@@ -2018,6 +2024,11 @@ class PlayState extends MusicBeatState
 					daNote.destroy();
 				}
 				
+				if (daNote.mustPress && daNote.sickChanced && !daNote.isSustainNote && !daNote.wasGoodHit && playerBotplay)
+				{
+					goodNoteHit(daNote);
+				}
+				
 				opponentStrums.forEachAlive(function(staticNote:FlxSprite) // doin cool shit
 				{
 					if (staticNote.animation.curAnim.finished && staticNote.animation.curAnim.name == 'confirm' && !opponentSusArray[staticNote.ID])
@@ -2048,6 +2059,12 @@ class PlayState extends MusicBeatState
 					if (daNote.tooLate || !daNote.wasGoodHit)
 					{
 						health -= 0.0475;
+						if (scoreComplex)
+						{
+							songPotentialScore += 350;
+							if (songScore > 0)
+								songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+						}
 						vocals.volume = 0;
 					}
 
@@ -2077,7 +2094,7 @@ class PlayState extends MusicBeatState
 		canPause = false;
 		FlxG.sound.music.volume = 0;
 		vocals.volume = 0;
-		if (SONG.validScore)
+		if (SONG.validScore && !playerBotplay)
 		{
 			#if !switch
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty);
@@ -2105,7 +2122,7 @@ class PlayState extends MusicBeatState
 				// if ()
 				StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
 
-				if (SONG.validScore)
+				if (SONG.validScore && !playerBotplay)
 				{
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
@@ -2398,11 +2415,11 @@ class PlayState extends MusicBeatState
 		var releaseArray:Array<Bool> = [controls.NOTE_LEFT_R, controls.NOTE_DOWN_R, controls.NOTE_UP_R, controls.NOTE_RIGHT_R];
 
 		// FlxG.watch.addQuick('asdfa', upP);
-		if (holdingArray.contains(true) && generatedMusic)
+		if ((holdingArray.contains(true) || playerBotplay) && generatedMusic)
 		{
 			notes.forEachAlive(function(daNote:Note)
 			{
-				if (daNote.isSustainNote && daNote.canBeHit && daNote.mustPress && holdingArray[daNote.noteData])
+				if (daNote.isSustainNote && daNote.canBeHit && daNote.mustPress && (holdingArray[daNote.noteData] || playerBotplay))
 					goodNoteHit(daNote);
 			});
 		}
@@ -2465,7 +2482,6 @@ class PlayState extends MusicBeatState
 				{
 					if (controlArray[i] && !ignoreList.contains(i))
 					{
-						songPotentialScore += 350;
 						badNoteHit();
 					}
 				}
@@ -2573,6 +2589,8 @@ class PlayState extends MusicBeatState
 	{
 		if (!note.wasGoodHit)
 		{
+			if (playerBotplay)
+				boyfriend.holdTimer = 0;
 			if (!note.isSustainNote)
 			{
 				popUpScore(note.strumTime, note);
