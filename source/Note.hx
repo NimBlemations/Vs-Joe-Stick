@@ -39,6 +39,8 @@ class Note extends FlxSprite
 	public static var GREEN_NOTE:Int = 2;
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
+	
+	public var prevHeight:Float = 0;
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?poseVariation:Int = 0)
 	{
@@ -131,6 +133,8 @@ class Note extends FlxSprite
 		}
 
 		// trace(prevNote);
+		
+		prevHeight = prevNote.scale.y;
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -181,6 +185,17 @@ class Note extends FlxSprite
 				// prevNote.setGraphicSize();
 			}
 			prevNote.noteStatus = 2;
+		}
+	}
+	
+	public function updateHeight(scrollSpeed:Float)
+	{
+		if (prevNote.isSustainNote && isSustainNote)
+		{
+			var newScale:Float = prevNote.prevHeight * (Conductor.stepCrochet / 100 * 1.5 * scrollSpeed);
+			if (prevNote.scale != null)
+				if (newScale != prevNote.scale.y)
+					prevNote.scale.y = newScale;
 		}
 	}
 

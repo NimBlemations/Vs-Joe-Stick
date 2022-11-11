@@ -144,6 +144,8 @@ class PlayState extends MusicBeatState
 	var scoreTxt:FlxText;
 	var scoreComplex:Bool = PreferencesMenu.getPref('score-complex');
 	
+	var scrollSpeed:Float = 1.8;
+	
 	var playerBotplay:Bool = PreferencesMenu.getPref('player-botplay');
 
 	public static var campaignScore:Int = 0;
@@ -204,6 +206,8 @@ class PlayState extends MusicBeatState
 
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
+		
+		scrollSpeed = SONG.speed;
 
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
@@ -1905,7 +1909,7 @@ class PlayState extends MusicBeatState
 
 		while (unspawnNotes[0] != null)
 		{
-			if (unspawnNotes[0].strumTime - Conductor.songPosition < 1800 / SONG.speed)
+			if (unspawnNotes[0].strumTime - Conductor.songPosition < 1800 / scrollSpeed)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				notes.add(dunceNote);
@@ -1939,7 +1943,7 @@ class PlayState extends MusicBeatState
 				// i am so fucking sorry for these if conditions
 				if (PreferencesMenu.getPref('downscroll'))
 				{
-					daNote.y = strumLine.y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+					daNote.y = strumLine.y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(scrollSpeed, 2);
 					
 					if (daNote.isSustainNote)
 					{
@@ -1961,7 +1965,7 @@ class PlayState extends MusicBeatState
 				}
 				else
 				{
-					daNote.y = strumLine.y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+					daNote.y = strumLine.y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(scrollSpeed, 2);
 	
 					if (daNote.isSustainNote
 						&& daNote.y + daNote.offset.y * daNote.scale.y <= center
@@ -2883,7 +2887,34 @@ class PlayState extends MusicBeatState
 				upperBoppers.animation.play('bop', true);
 				bottomBoppers.animation.play('bop', true);
 				santa.animation.play('idle', true);
-
+			case 'mallEvil': // lmao abundance of events
+				if (curBeat == 67)
+					scrollSpeed += 0.2; // 1.5
+				else if (curBeat == 99)
+					scrollSpeed += 0.1; // 1.6
+				else if (curBeat == 117)
+					scrollSpeed -= 0.2; // 1.4
+				else if (curBeat == 134)
+					scrollSpeed += 0.1; // 1.5
+				else if (curBeat == 151)
+					scrollSpeed += 0.3; // 1.8
+				else if (curBeat == 183)
+					scrollSpeed -= 0.3; // 1.5
+				else if (curBeat == 195)
+					scrollSpeed += 0.1; // 1.6
+				else if (curBeat == 232)
+					scrollSpeed -= 0.1; // 1.5
+				else if (curBeat == 247)
+					scrollSpeed += 0.1; // 1.6
+				else if (curBeat == 288)
+					scrollSpeed += 0.2; // 1.8
+				else if (curBeat == 311)
+					scrollSpeed -= 0.2; // 1.6
+				notes.forEachAlive(function(daNote:Note)
+				{
+					if (daNote.isSustainNote)
+						daNote.updateHeight(scrollSpeed);
+				});
 			case 'limo':
 				grpLimoDancers.forEach(function(dancer:BackgroundDancer)
 				{
