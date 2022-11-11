@@ -192,7 +192,7 @@ class PlayState extends MusicBeatState
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 		#if MEMORY_OPTIMIZATION
-		Paths.preloadGraphic('noteSplashes'); // I'm just cool that way B')
+		Paths.preloadGraphic('noteSplashes', null, true); // I'm just cool that way B')
 		#else
 		var splash:NoteSplash = new NoteSplash(100, 100, 0);
 		grpNoteSplashes.add(splash);
@@ -1192,6 +1192,21 @@ class PlayState extends MusicBeatState
 		Paths.preloadGraphic(introAlts[0]);
 		Paths.preloadGraphic(introAlts[1]);
 		Paths.preloadGraphic(introAlts[2]);
+		Paths.preloadSound('sounds', 'intro3' + altSuffix);
+		Paths.preloadSound('sounds', 'intro2' + altSuffix);
+		Paths.preloadSound('sounds', 'intro1' + altSuffix);
+		Paths.preloadSound('sounds', 'introGo' + altSuffix);
+		for (i in 1...4)
+		{
+			Paths.preloadSound('sounds', 'missnote' + i);
+		}
+		if (curStage == 'spooky')
+		{
+			for (i in 1...3)
+			{
+				Paths.preloadSound('sounds', 'thunder_' + i);
+			}
+		}
 		#end
 
 		startTimer.start(Conductor.crochet / 1000, function(tmr:FlxTimer)
@@ -2061,9 +2076,11 @@ class PlayState extends MusicBeatState
 						health -= 0.0475;
 						if (scoreComplex)
 						{
-							songPotentialScore += 350;
+							if (!daNote.isSustainNote)
+								songPotentialScore += 350;
 							if (songScore > 0)
 								songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+							++songMisses;
 						}
 						vocals.volume = 0;
 					}
@@ -2522,8 +2539,6 @@ class PlayState extends MusicBeatState
 	{
 		if (scoreComplex)
 		{
-			++songMisses;
-			
 			if (songScore > 0)
 				songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
 		}
@@ -2568,6 +2583,11 @@ class PlayState extends MusicBeatState
 
 	function badNoteHit()
 	{
+		if (scoreComplex)
+		{
+			++songMisses;
+			songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+		}
 		// just double pasting this shit cuz fuk u
 		// REDO THIS SYSTEM!
 		var leftP = controls.NOTE_LEFT_P;
@@ -2589,8 +2609,7 @@ class PlayState extends MusicBeatState
 	{
 		if (!note.wasGoodHit)
 		{
-			if (playerBotplay)
-				boyfriend.holdTimer = 0;
+			boyfriend.holdTimer = 0;
 			if (!note.isSustainNote)
 			{
 				popUpScore(note.strumTime, note);

@@ -195,7 +195,7 @@ class Note extends FlxSprite
 
 		if (mustPress)
 		{
-			if (willMiss)
+			if (willMiss && !wasGoodHit)
 			{
 				tooLate = true;
 				canBeHit = false;

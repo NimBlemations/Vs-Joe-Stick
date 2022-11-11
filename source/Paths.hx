@@ -2,22 +2,12 @@ package;
 
 // With the conditionals, I just want to not leave ANYTHING unnecessary behind on compile, but the flags are getting ridiculous, I know.
 
-#if MEMORY_OPTIMIZATION
-import flash.geom.Rectangle;
-#end
 import flixel.FlxG;
 #if MEMORY_OPTIMIZATION
 import flixel.graphics.FlxGraphic;
 #end
 import flixel.graphics.frames.FlxAtlasFrames;
 #if MEMORY_OPTIMIZATION
-import flixel.graphics.frames.FlxFrame;
-import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
-import flixel.graphics.frames.FlxFramesCollection;
-import flixel.graphics.frames.FlxFramesCollection.FlxFrameCollectionType;
-import flixel.math.FlxPoint;
-import flixel.math.FlxRect;
-import haxe.xml.Access;
 import lime.utils.Assets;
 import openfl.display3D.textures.Texture;
 import openfl.display.BitmapData;
@@ -165,6 +155,7 @@ class Paths
 		// trace(gottenPath);
 		if (!currentTrackedSounds.exists(gottenPath))
 		{
+			trace('preloading $key');
 			var folder:String = '';
 			if (path == 'songs')
 				folder = 'songs:';
@@ -188,7 +179,7 @@ class Paths
 					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
 					currentTrackedAssets.set(path, newGraphic);
-					if (packXml) // This shit is fuckin' broken, don't know what's going wrong and I am too unbothered to persue
+					if (packXml) // Woah it works?!?!?!?
 					{
 						var xmlPath = getPath('images/$key.xml', TEXT, library);
 						#if debug
@@ -196,55 +187,18 @@ class Paths
 						#end
 						if (OpenFlAssets.exists(xmlPath))
 						{
-							if (key.endsWith('s'))
-								trace('preloading ${key}\' xml');
-							else
-								trace('preloading ${key}\'s xml');
-							var xmlText = OpenFlAssets.getText(xmlPath);
-							var frameArray:Array<FlxFrame> = [];
-							var xmlAccess:Access = new Access(Xml.parse(xmlText).firstElement());
-							
-							@:privateAccess
-							for (texture in xmlAccess.nodes.SubTexture) // For all of this, go to https://github.com/HaxeFlixel/flixel/blob/master/flixel/graphics/frames/FlxAtlasFrames.hx
+							var atlasFrames:FlxAtlasFrames = FlxAtlasFrames.fromSparrow(newGraphic, xmlPath);
+							if (atlasFrames != null)
+							#if debug
 							{
-								var name = texture.att.name;
-								var trimmed = texture.has.frameX;
-								var rotated = (texture.has.rotated && texture.att.rotated == "true");
-								var flipX = (texture.has.flipX && texture.att.flipX == "true");
-								var flipY = (texture.has.flipY && texture.att.flipY == "true");
-								
-								var rect = FlxRect.get(Std.parseFloat(texture.att.x), Std.parseFloat(texture.att.y), Std.parseFloat(texture.att.width), 
-									Std.parseFloat(texture.att.height));
-								
-								var size = if (trimmed)
-								{
-									new Rectangle(Std.parseInt(texture.att.frameX), Std.parseInt(texture.att.frameY), Std.parseInt(texture.att.frameWidth),
-										Std.parseInt(texture.att.frameHeight));
-								}
-								else
-								{
-									new Rectangle(0, 0, rect.width, rect.height);
-								}
-								
-								var angle = rotated ? FlxFrameAngle.ANGLE_NEG_90 : FlxFrameAngle.ANGLE_0;
-								
-								var offset = FlxPoint.get( -size.left, -size.top);
-								var sourceSize = FlxPoint.get(size.width, size.height);
-								
-								if (rotated && !trimmed)
-									sourceSize.set(size.height, size.width);
-								
-								var xmlFrame:FlxFrame = new FlxFrame(newGraphic, angle, flipX, flipY);
-								
-								xmlFrame.frame = rect;
-								xmlFrame.name = name;
-								
-								frameArray.push(xmlFrame);
+								trace('preloaded xml woop woop!');
+								#end
+								newGraphic.addFrameCollection(atlasFrames);
+								#if debug
 							}
-							
-							var xmlCollection:FlxFramesCollection = new FlxFramesCollection(newGraphic, FlxFrameCollectionType.ATLAS);
-							
-							newGraphic.addFrameCollection(xmlCollection); // Fuckin' wild ride that was...
+							else
+								trace('augh, didn\'t work');
+							#end
 						}
 					}
 				}
