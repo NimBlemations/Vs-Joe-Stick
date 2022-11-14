@@ -63,15 +63,31 @@ class Paths
 				@:privateAccess
 				if (obj != null)
 				{
-					openfl.Assets.cache.removeBitmapData(key);
-					FlxG.bitmap._cache.remove(key);
+					if (currentTrackedTextures.exists(key)) // If Stage3D texture
+					{
+						var texture = currentTrackedTextures.get(key);
+						texture.dispose();
+						texture = null;
+						currentTrackedTextures.remove(key);
+						#if debug
+						trace('ungpu\'d, biatch');
+						#end
+					}
+					else
+					{
+						openfl.Assets.cache.removeBitmapData(key);
+						FlxG.bitmap._cache.remove(key);
+					}
 					obj.destroy();
 					currentTrackedAssets.remove(key);
 				}
 			}
 			counter++;
 		}
-		trace('removed $counter assets');
+		if (counter == 1)
+			trace('removed $counter asset'); // detail lmao
+		else
+			trace('removed $counter assets');
 		// run the garbage collector for good measure lmfao
 		System.gc();
 	}
@@ -107,7 +123,7 @@ class Paths
 		openfl.Assets.cache.clear("songs");
 	}
 	
-	public static function returnGraphic(key:String, ?library:String)
+	public static function returnGraphic(key:String, ?library:String, ?textureCompression:Bool = false)
 	{
 		var path = getPath('images/$key.png', IMAGE, library);
 		// trace(path);
@@ -117,7 +133,20 @@ class Paths
 			{
 				if (!currentTrackedAssets.exists(path))
 				{
-					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
+					var newGraphic:FlxGraphic = null;
+					if (textureCompression)
+					{
+						var bitmap:BitmapData = OpenFlAssets.getBitmapData(path);
+						var texture = FlxG.stage.context3D.createTexture(bitmap.width, bitmap.height, BGRA, true, 0);
+						texture.uploadFromBitmapData(bitmap);
+						currentTrackedTextures.set(path, texture);
+						bitmap.dispose();
+						bitmap.disposeImage();
+						bitmap = null;
+						newGraphic = FlxGraphic.fromBitmapData(BitmapData.fromTexture(texture), false, key, false);
+					}
+					else
+						newGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
 					currentTrackedAssets.set(path, newGraphic);
 				}
@@ -165,7 +194,7 @@ class Paths
 	}
 	#end
 	
-	public static function preloadGraphic(key:String, ?library:String, ?packXml:Bool = false)
+	public static function preloadGraphic(key:String, ?library:String, ?packXml:Bool = false, ?textureCompression:Bool = false)
 	{
 		#if MEMORY_OPTIMIZATION
 		var path = getPath('images/$key.png', IMAGE, library);
@@ -176,9 +205,22 @@ class Paths
 				if (!currentTrackedAssets.exists(path))
 				{
 					trace('preloading $key');
-					var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
+					var newGraphic:FlxGraphic = null;
+					if (textureCompression)
+					{
+						var bitmap:BitmapData = OpenFlAssets.getBitmapData(path);
+						var texture = FlxG.stage.context3D.createTexture(bitmap.width, bitmap.height, BGRA, true, 0);
+						texture.uploadFromBitmapData(bitmap);
+						currentTrackedTextures.set(path, texture);
+						bitmap.dispose();
+						bitmap.disposeImage();
+						bitmap = null;
+						newGraphic = FlxGraphic.fromBitmapData(BitmapData.fromTexture(texture), false, key, false);
+					}
+					else
+						newGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
-					currentTrackedAssets.set(path, newGraphic);
+					localTrackedAssets.push(path);
 					if (packXml) // Woah it works?!?!?!?
 					{
 						var xmlPath = getPath('images/$key.xml', TEXT, library);
@@ -200,6 +242,10 @@ class Paths
 								trace('augh, didn\'t work');
 							#end
 						}
+						#if debug
+						else
+							trace('guess you better pack deez nuts');
+						#end
 					}
 				}
 			}
@@ -316,10 +362,10 @@ class Paths
 		#end
 	}
 
-	inline static public function image(key:String, ?library:String) #if MEMORY_OPTIMIZATION :FlxGraphic #end
+	inline static public function image(key:String, ?library:String, #if MEMORY_OPTIMIZATION ?textureCompression:Bool = false #end ) #if MEMORY_OPTIMIZATION :FlxGraphic #end
 	{
 		#if MEMORY_OPTIMIZATION
-		var returnAsset:FlxGraphic = returnGraphic(key, library);
+		var returnAsset:FlxGraphic = returnGraphic(key, library, textureCompression);
 		return returnAsset;
 		#else
 		return getPath('images/$key.png', IMAGE, library);
@@ -336,10 +382,10 @@ class Paths
 		return getPath('music/$key.mp4', TEXT, library);
 	}
 
-	inline static public function getSparrowAtlas(key:String, ?library:String)
+	inline static public function getSparrowAtlas(key:String, ?library:String, #if MEMORY_OPTIMIZATION ?textureCompression:Bool = false #end )
 	{
 		#if MEMORY_OPTIMIZATION
-		var graphic:FlxGraphic = returnGraphic(key, library);
+		var graphic:FlxGraphic = returnGraphic(key, library, textureCompression);
 		return FlxAtlasFrames.fromSparrow(graphic, file('images/$key.xml', library));
 		#else
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));

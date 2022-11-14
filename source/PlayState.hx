@@ -194,7 +194,7 @@ class PlayState extends MusicBeatState
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 		#if MEMORY_OPTIMIZATION
-		Paths.preloadGraphic('noteSplashes', null, true); // I'm just cool that way B')
+		Paths.preloadGraphic('noteSplashes', null, true, true); // I'm just cool that way B')
 		#else
 		var splash:NoteSplash = new NoteSplash(100, 100, 0);
 		grpNoteSplashes.add(splash);
