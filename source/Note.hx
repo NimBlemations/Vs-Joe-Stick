@@ -90,7 +90,7 @@ class Note extends FlxSprite
 				updateHitbox();
 
 			default:
-				frames = Paths.getSparrowAtlas('NOTE_assets');
+				frames = Paths.getSparrowAtlas('NOTE_assets', null, true); // gpu render note and faster
 
 				animation.addByPrefix('greenScroll', 'green instance');
 				animation.addByPrefix('redScroll', 'red instance');

@@ -62,6 +62,10 @@ class PlayState extends MusicBeatState
 	public static var deathCounter:Int = 0;
 	public static var practiceMode:Bool = false;
 	public static var seenCutscene:Bool = false;
+	
+	#if MEMORY_OPTIMIZATION
+	public static var instance:PlayState;
+	#end
 
 	var halloweenLevel:Bool = false;
 
@@ -169,6 +173,10 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		super.create();
+		
+		#if MEMORY_OPTIMIZATION
+		instance = this;
+		#end
 		
 		#if debug
 		trace('botplay be $playerBotplay me boy');
@@ -1664,6 +1672,31 @@ class PlayState extends MusicBeatState
 			}
 		}
 	}
+	
+	#if MEMORY_OPTIMIZATION
+	public function restart()
+	{
+		Conductor.songPosition = 0;
+		startedCountdown = false;
+		boyfriend.stunned = false;
+		paused = false;
+		for (i in members)
+		{
+			remove(i);
+		}
+		songScore = 0;
+		songPotentialScore = 0;
+		songMisses = 0;
+		songStaticAccuracy = 0;
+		combo = 0;
+		unspawnNotes = [];
+		notes.clear();
+		startingSong = false;
+		health = 1;
+		
+		create();
+	}
+	#end
 
 	private var paused:Bool = false;
 	var startedCountdown:Bool = false;

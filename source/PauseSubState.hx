@@ -141,7 +141,7 @@ class PauseSubState extends MusicBeatSubstate
 				case "Resume":
 					close();
 				case "Restart Song":
-					FlxG.resetState();
+					PlayState.instance.restart();
 				case "Change Difficulty":
 					menuItems = difficultyChoices;
 					regenMenu();
