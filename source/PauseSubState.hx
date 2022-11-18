@@ -141,7 +141,11 @@ class PauseSubState extends MusicBeatSubstate
 				case "Resume":
 					close();
 				case "Restart Song":
+					#if MEMORY_OPTIMIZATION
 					PlayState.instance.restart();
+					#else
+					FlxG.resetState();
+					#end
 				case "Change Difficulty":
 					menuItems = difficultyChoices;
 					regenMenu();
@@ -159,7 +163,11 @@ class PauseSubState extends MusicBeatSubstate
 				case "EASY" | "NORMAL" | "HARD":
 					PlayState.SONG = Song.loadFromJson(Highscore.formatSong(PlayState.SONG.song.toLowerCase(), curSelected), PlayState.SONG.song.toLowerCase());
 					PlayState.storyDifficulty = curSelected;
+					#if MEMORY_OPTIMIZATION
+					PlayState.instance.restart();
+					#else
 					FlxG.resetState();
+					#end
 				case "BACK":
 					menuItems = pauseOG;
 					regenMenu();
