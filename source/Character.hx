@@ -17,6 +17,8 @@ class Character extends FlxSprite
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = 'bf';
 	public var barColor:FlxColor;
+	
+	var flipProtection:Bool = false;
 
 	public var holdTimer:Float = 0;
 	
@@ -39,7 +41,6 @@ class Character extends FlxSprite
 		var tex:FlxAtlasFrames;
 		antialiasing = true;
 		
-
 		switch (curCharacter)
 		{
 			case 'gf':
@@ -236,6 +237,8 @@ class Character extends FlxSprite
 				playAnim('idle');
 
 				flipX = true;
+				
+				flipProtection = true;
 
 			case 'pico-speaker':
 				frames = Paths.getSparrowAtlas('characters/picoSpeaker');
@@ -521,30 +524,44 @@ class Character extends FlxSprite
 				playAnim('idle');
 
 				flipX = true;
+				
+				flipProtection = true;
 		}
 
 		dance();
 		animation.finish();
 
 		if (isPlayer)
-		{
 			flipX = !flipX;
-
-			// Doesn't flip for BF, since his are already in the right place???
-			if (!curCharacter.startsWith('bf'))
+		
+		if (flipX && !flipProtection)
+		{
+			trace('ooo look like a feeple deeple');
+			// var animArray
+			var oldRight = animation.getByName('singRIGHT').frames;
+			animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
+			animation.getByName('singLEFT').frames = oldRight;
+			
+			if (animOffsets.exists('singRIGHT'))
 			{
-				// var animArray
-				var oldRight = animation.getByName('singRIGHT').frames;
-				animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
-				animation.getByName('singLEFT').frames = oldRight;
-
-				// IF THEY HAVE MISS ANIMATIONS??
-				if (animation.getByName('singRIGHTmiss') != null)
+				trace('flipple the offsets');
+				var oldRightOff = animOffsets.get('singRIGHT');
+				animOffsets['singRIGHT'] = animOffsets.get('singLEFT');
+				animOffsets['singLEFT'] = oldRightOff;
+				if (animOffsets.exists('singRIGHTmiss'))
 				{
-					var oldMiss = animation.getByName('singRIGHTmiss').frames;
-					animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
-					animation.getByName('singLEFTmiss').frames = oldMiss;
+					var oldRightMissOff = animOffsets.get('singRIGHTmiss');
+					animOffsets['singRIGHTmiss'] = animOffsets.get('singLEFTmiss');
+					animOffsets['singLEFTmiss'] = oldRightOff;
 				}
+			}
+
+			// IF THEY HAVE MISS ANIMATIONS??
+			if (animation.getByName('singRIGHTmiss') != null)
+			{
+				var oldMiss = animation.getByName('singRIGHTmiss').frames;
+				animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
+				animation.getByName('singLEFTmiss').frames = oldMiss;
 			}
 		}
 	}
@@ -683,7 +700,10 @@ class Character extends FlxSprite
 		var daOffset = animOffsets.get(AnimName);
 		if (animOffsets.exists(AnimName))
 		{
-			offset.set(daOffset[0], daOffset[1]);
+			if (flipX && !flipProtection)
+				offset.set(-daOffset[0], daOffset[1]);
+			else
+				offset.set(daOffset[0], daOffset[1]);
 		}
 		else
 			offset.set(0, 0);

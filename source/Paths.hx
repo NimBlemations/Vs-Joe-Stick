@@ -220,7 +220,7 @@ class Paths
 					else
 						newGraphic = FlxG.bitmap.add(path, false, path);
 					newGraphic.persist = true;
-					localTrackedAssets.push(path);
+					currentTrackedAssets.set(path, newGraphic);
 					if (packXml) // Woah it works?!?!?!?
 					{
 						var xmlPath = getPath('images/$key.xml', TEXT, library);
@@ -249,6 +249,7 @@ class Paths
 					}
 				}
 			}
+			localTrackedAssets.push(path);
 		}
 		else
 			trace('oh no $key is null NOOOO');
