@@ -163,7 +163,9 @@
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
 	<!-- _________________________________ Custom _______________________________ -->
-
+	
+	<!-- <define name="FEATURE_WATCHED_INPUT" unless="web" /> -->
+	
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
 	
 	<icon path="art/icon16.png" size='16'/>

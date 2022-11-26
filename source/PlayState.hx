@@ -46,6 +46,9 @@ import haxe.Json;
 import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
+#if FEATURE_WATCHED_INPUT
+import openfl.events.KeyboardEvent;
+#end
 import openfl.filters.ShaderFilter;
 import openfl.utils.Assets as OpenFlAssets;
 
@@ -1016,6 +1019,11 @@ class PlayState extends MusicBeatState
 					startCountdown();
 			}
 		}
+		
+		#if FEATURE_WATCHED_INPUT
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, handleInput);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, releaseInput);
+		#end
 	}
 
 	function ughIntro():Void
@@ -2131,7 +2139,7 @@ class PlayState extends MusicBeatState
 				}
 			});
 		}
-
+		
 		if (!inCutscene)
 			keyShit();
 
@@ -2461,12 +2469,140 @@ class PlayState extends MusicBeatState
 			}
 		}
 	}
+	
+	#if FEATURE_WATCHED_INPUT
+	private var controlSet = FlxG.save.data.controls.p1;
+	private var holdingArray:Array<Bool> = [false, false, false, false];
+	
+	private function isKey(evt:KeyboardEvent, keys:Null<Array<Int>>):Bool
+	{
+		if (keys != null)
+		{
+			for (key in keys)
+			{
+				if (key == evt.keyCode)
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	private function handleInput(evt:KeyboardEvent)
+	{
+		if (!inCutscene && generatedMusic)
+		{
+			boyfriend.holdTimer = 0;
+			
+			var possibleNotes:Array<Note> = [];
+
+			var ignoreList:Array<Int> = [];
+
+			var removeList:Array<Note> = [];
+			
+			notes.forEachAlive(function(daNote:Note)
+			{
+				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
+				{
+					if (ignoreList.contains(daNote.noteData))
+					{
+						for (possibleNote in possibleNotes)
+						{
+							if (possibleNote.noteData == daNote.noteData && Math.abs(daNote.strumTime - possibleNote.strumTime) < 10)
+							{
+								removeList.push(daNote);
+							}
+							else if (possibleNote.noteData == daNote.noteData && daNote.strumTime < possibleNote.strumTime)
+							{
+								possibleNotes.remove(possibleNote);
+								possibleNotes.push(daNote);
+							}
+						}
+					}
+					else
+					{
+						possibleNotes.push(daNote);
+						ignoreList.push(daNote.noteData);
+					}
+				}
+			});
+
+			for (badNote in removeList)
+			{
+				badNote.kill();
+				notes.remove(badNote, true);
+				badNote.destroy();
+			}
+
+			possibleNotes.sort(function(note1:Note, note2:Note)
+			{
+				return Std.int(note1.strumTime - note2.strumTime);
+			});
+			
+			var keysOfThee:Map<String, Array<Int>> = controlSet.keys;
+			
+			var controlArray:Array<Bool> = [isKey(evt, keysOfThee.get('NOTE_LEFT')), isKey(evt, keysOfThee.get('NOTE_DOWN')), isKey(evt, keysOfThee.get('NOTE_UP')), isKey(evt, keysOfThee.get('NOTE_RIGHT'))];
+			
+			for (i in 0...controlArray.length)
+			{
+				if (controlArray[i] && !holdingArray[i])
+					holdingArray[i] = true;
+				else if (holdingArray[i])
+					controlArray[i] = false;
+			}
+			
+			if (perfectMode)
+			{
+				goodNoteHit(possibleNotes[0]);
+			}
+			else if (possibleNotes.length > 0)
+			{
+				for (i in 0...controlArray.length)
+				{
+					if (controlArray[i] && !ignoreList.contains(i) && !holdingArray[i])
+					{
+						badNoteHit();
+					}
+				}
+				for (possibleNote in possibleNotes)
+				{
+					if (controlArray[possibleNote.noteData])
+					{
+						goodNoteHit(possibleNote);
+					}
+				}
+			}
+			else
+				badNoteHit();
+			
+			playerStrums.forEach(function(spr:FlxSprite)
+			{
+				if (controlArray[spr.ID] && spr.animation.curAnim.name != 'confirm')
+					spr.animation.play('pressed');
+			});
+		}
+	}
+	
+	private function releaseInput(evt:KeyboardEvent)
+	{
+		var keysOfThee:Map<String, Array<Int>> = controlSet.keys;
+			
+		var controlArray:Array<Bool> = [isKey(evt, keysOfThee.get('NOTE_LEFT')), isKey(evt, keysOfThee.get('NOTE_DOWN')), isKey(evt, keysOfThee.get('NOTE_UP')), isKey(evt, keysOfThee.get('NOTE_RIGHT'))];
+		
+		for (i in 0...controlArray.length)
+		{
+			if (controlArray[i] && !holdingArray[i])
+				holdingArray[i] = false;
+		}
+	}
+	#end
 
 	private function keyShit():Void
 	{
+		#if !FEATURE_WATCHED_INPUT
 		var holdingArray:Array<Bool> = [controls.NOTE_LEFT, controls.NOTE_DOWN, controls.NOTE_UP, controls.NOTE_RIGHT];
 		var controlArray:Array<Bool> = [controls.NOTE_LEFT_P, controls.NOTE_DOWN_P, controls.NOTE_UP_P, controls.NOTE_RIGHT_P];
 		var releaseArray:Array<Bool> = [controls.NOTE_LEFT_R, controls.NOTE_DOWN_R, controls.NOTE_UP_R, controls.NOTE_RIGHT_R];
+		#end
 
 		// FlxG.watch.addQuick('asdfa', upP);
 		if ((holdingArray.contains(true) || playerBotplay) && generatedMusic)
@@ -2477,6 +2613,7 @@ class PlayState extends MusicBeatState
 					goodNoteHit(daNote);
 			});
 		}
+		#if !FEATURE_WATCHED_INPUT
 		if (controlArray.contains(true) && generatedMusic)
 		{
 			boyfriend.holdTimer = 0;
@@ -2550,14 +2687,17 @@ class PlayState extends MusicBeatState
 			else
 				badNoteHit();
 		}
+		#end
 		if (boyfriend.holdTimer > 0.004 * Conductor.stepCrochet && !holdingArray.contains(true) && boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
 		{
 			boyfriend.playAnim('idle');
 		}
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
+			#if !FEATURE_WATCHED_INPUT
 			if (controlArray[spr.ID] && spr.animation.curAnim.name != 'confirm')
 				spr.animation.play('pressed');
+			#end
 			if (!holdingArray[spr.ID])
 				spr.animation.play('static');
 
