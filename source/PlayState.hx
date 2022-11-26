@@ -148,6 +148,8 @@ class PlayState extends MusicBeatState
 	var songPotentialScore:Int = 0;
 	var songMisses:Int = 0;
 	var songStaticAccuracy:Float = 0;
+	var songNotesPassed:Int = 0;
+	var songNotesHit:Float = 0;
 	var scoreTxt:FlxText;
 	var scoreComplex:Bool = PreferencesMenu.getPref('score-complex');
 	
@@ -1696,6 +1698,8 @@ class PlayState extends MusicBeatState
 		songPotentialScore = 0;
 		songMisses = 0;
 		songStaticAccuracy = 0;
+		songNotesPassed = 0;
+		songNotesHit = 0;
 		combo = 0;
 		unspawnNotes = [];
 		notes.clear();
@@ -2123,8 +2127,9 @@ class PlayState extends MusicBeatState
 						{
 							if (!daNote.isSustainNote)
 								songPotentialScore += 350;
+							++songNotesPassed;
 							if (songScore > 0)
-								songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+								songStaticAccuracy = FlxMath.roundDecimal((songNotesHit / songNotesPassed) * 100, 2);
 							++songMisses;
 						}
 						vocals.volume = 0;
@@ -2297,8 +2302,11 @@ class PlayState extends MusicBeatState
 			{
 				songPotentialScore += 350;
 				
+				++songNotesPassed;
+				songNotesHit += Etterna.wife3(noteDiff);
+				
 				if (songScore > 0)
-					songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+					songStaticAccuracy = FlxMath.roundDecimal((songNotesHit / songNotesPassed) * 100, 2);
 			}
 		}
 
@@ -2716,8 +2724,9 @@ class PlayState extends MusicBeatState
 	{
 		if (scoreComplex)
 		{
+			++songNotesPassed;
 			if (songScore > 0)
-				songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
+				songStaticAccuracy = FlxMath.roundDecimal((songNotesHit / songNotesPassed) * 100, 2);
 		}
 		if (!boyfriend.stunned)
 		{
@@ -2761,10 +2770,7 @@ class PlayState extends MusicBeatState
 	function badNoteHit()
 	{
 		if (scoreComplex)
-		{
 			++songMisses;
-			songStaticAccuracy = FlxMath.roundDecimal((songScore / songPotentialScore) * 100, 2);
-		}
 		// just double pasting this shit cuz fuk u
 		// REDO THIS SYSTEM!
 		var leftP = controls.NOTE_LEFT_P;
